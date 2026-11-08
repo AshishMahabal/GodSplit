@@ -62,3 +62,9 @@
 
 **User:**
 > let me know once done
+
+**User:**
+> are the tests included or only scratch? I think we should have them
+
+**User:**
+> yes, add tools/shot.sh

@@ -109,3 +109,4 @@ English first, adults, story words included but not the limit, reveal shown to e
 - New `src` field on every dilemma: one line on where it comes from (Upanishad, Mahabharata book, Plato, Newcomb, the story itself). Shown in small italics under the text. `validate.js` now requires it.
 - The trolley follow-ups now remind you what you did a minute ago ("A minute ago you pulled it").
 - Questions answered: each dilemma always has the same 2 options and 3 assumptions. Only their order, the strawman, the decoy and the feedback wording vary. Variety between runs comes mainly from which dilemmas are drawn.
+- Added `tools/shot.sh [dilemma-id] [out.png]`: headless Chrome screenshot of the start screen or any dilemma. Works on a temp copy of the page with transitions off and the secret word skipped, so the real page and the stored word are untouched. The HUD still says Rung 1, whichever dilemma is shown.

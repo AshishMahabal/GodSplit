@@ -59,7 +59,7 @@ See [DESIGN.md](DESIGN.md) for the full plan and milestones.
 | `NOTES.md` | Running log of decisions and known limitations |
 | `COMMANDS.md` | Commands to play and test |
 | `PROMPTS.md` | Prompts used while building this with Claude Code |
-| `tools/` | `test.sh`: syntax check, content check, scripted playthroughs (needs Node and Python 3). `set_secret.py`: set the beta secret word |
+| `tools/` | `test.sh`: syntax check, content check, scripted playthroughs (needs Node and Python 3). `set_secret.py`: set the beta secret word. `shot.sh <id>`: screenshot a dilemma (needs Chrome) |
 | `source/` | Text of the story page, for reference |
 
 ## Contributing
