@@ -92,7 +92,7 @@ body.locked .hud,body.locked #rung{display:none}
     </div>
   </div>
   <div id="view"></div>
-  <footer>Prototype M1. Based on the story नैकेश्वर (ऐसी अक्षरे, 2025). "Other players" figures are simulated.</footer>
+  <footer>Prototype M1. Based on the story नैकेश्वर (ऐसी अक्षरे, 2025). Other players are simulated for now.<br>© 2026 Ashish Mahabal · Code: AGPL-3.0 · Content: CC BY-SA 4.0 · No warranty</footer>
 </main>
 
 <script src="dilemmas.js"></script>
@@ -370,9 +370,10 @@ function avatarName(){
 }
 function avatarReveal(){
   const [en,mr] = avatarName();
-  S.publicName = en;
-  const names = Object.values(AVATARS);
-  const others = shuffle(HANDLES).slice(0,6).map(h=>`<span>${esc(h)}: ${esc(pick(names)[0])}</span>`).join("");
+  S.publicName = `${en} · ${mr}`;
+  // Other players get distinct names, never the player's own, shown in both languages like the player's.
+  const names = shuffle(Object.values(AVATARS).filter(n=>n[0]!==en));
+  const others = shuffle(HANDLES).slice(0,6).map((h,i)=>`<span>${esc(h)}: ${esc(names[i][0])} · ${names[i][1]}</span>`).join("");
   V.innerHTML = `<div class="card center">
     <div class="sub">Avatar reveal · अवताराची ओळख</div>
     <p>Your avatar must now show its face to everyone on the network. Judging by your choices, it is:</p>

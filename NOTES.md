@@ -97,3 +97,8 @@ English first, adults, story words included but not the limit, reveal shown to e
 - Licence chosen by the author: AGPL-3.0-or-later (code) + CC BY-SA 4.0 (content). Official texts downloaded into `LICENSE` (gnu.org) and `LICENSE-CONTENT` (creativecommons.org legalcode.txt). SPDX tags added to the top of each code/content file. README has a licence table. `source/` is explicitly not licensed.
 - Copyright line uses the GitHub account name. The story's pen name is not linked to it anywhere in the repo.
 - Added `.gitignore`: macOS files, editor folders, Claude Code local settings, `tools/g.js` (test scratch), node/python caches, `.env*`.
+
+## 2026-11-08: Session 7
+- Footer: "Other players are simulated for now." plus "© 2026 Ashish Mahabal · Code: AGPL-3.0 · Content: CC BY-SA 4.0 · No warranty". No source link (repo may go private again).
+- Avatar reveal: the six simulated players now get distinct names, never the player's own, each shown in English and Marathi like the player's. The header's "seen as" also shows both languages. Before, a simulated player could share the player's name and look different because it showed only the English.
+- New test `sim.js reveal` (in test.sh): 500 reveals, checks 6 distinct bilingual names and none equal to the player's.

@@ -43,3 +43,11 @@
 > we should add a license before I announce it to beta testers. Also, are there any files we should gitignore?
 
 **Choice (asked):** AGPL-3.0 + CC BY-SA 4.0.
+
+## Session 7 (2026-11-08)
+
+**User:**
+> do we need to add a copyright line on the pages?
+
+**User:**
+> lets add the footer without the source link. Also, other players are simulated should be simulated for now. Finally, other players names were shown only in English, and one of them had been the same as the player. The player was shown as english and marathi, so that may have seemed different

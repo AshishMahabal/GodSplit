@@ -9,7 +9,7 @@ global.document={body:{classList:{add:c=>cls.add(c),remove:c=>cls.delete(c)}},ge
 global.innerWidth=800;global.innerHeight=600;global.devicePixelRatio=1;
 global.addEventListener=()=>{};global.requestAnimationFrame=()=>{};
 eval(fs.readFileSync(path.join(__dirname,'g.js'),'utf8')+`
-;global.G={buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,wordHash,S,get cur(){return cur},nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
+;global.G={AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,wordHash,S,get cur(){return cur},nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
 function unlockGate(){
   // Page must open on the lock screen; a wrong word keeps it shut; the right hash opens it.
   if(!cls.has('locked')||!G.V.innerHTML.includes('secret word')) throw Error('gate not shown');
@@ -43,7 +43,18 @@ function play(mode){
   return {gate:gateMsg,mode,dilemmas:seen.length,S:{doubt:G.S.doubt,tol:G.S.tol,ego:G.S.ego,rung:G.S.rung},
     maxLitBeforeFinal,finalLit:G.lit(),end,strong:G.V.innerHTML.includes('audit is complete'),revealMsgs};
 }
-if(process.argv[2]==='reach'){
+if(process.argv[2]==='reveal'){
+  // Public reveal: 6 other players, distinct names, none equal to the player's, each shown in English and Marathi.
+  let bad=0; const keys=Object.keys(G.AVATARS);
+  for(let i=0;i<500;i++){
+    G.S.tags={[keys[i%keys.length]]:1};
+    G.avatarReveal();
+    const me=G.V.innerHTML.match(/<b>([^<]+)<\/b>/)[1];
+    const others=[...G.V.innerHTML.matchAll(/<span>[^<]*?: ([^·<]+) · ([^<]+)<\/span>/g)].map(m=>m[1].trim());
+    if(others.length!==6||new Set(others).size!==6||others.includes(me)) bad++;
+  }
+  console.log(bad?'REVEAL FAIL in '+bad+' of 500':'reveal ok: 6 distinct bilingual names, never the player\'s own');
+} else if(process.argv[2]==='reach'){
   // Over many drawn ladders, every dilemma should turn up at least once.
   const seen=new Set([G.FINAL,'trolleyKin','trolleyKin2']);
   for(let i=0;i<2000;i++) G.buildPlan().flat().forEach(id=>seen.add(id));

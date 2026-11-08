@@ -12,4 +12,5 @@ node --check g.js && echo "syntax ok"
 node validate.js
 for m in doubter middle decoy lazy; do node sim.js $m; done
 node sim.js reach
+node sim.js reveal
 rm -f g.js
