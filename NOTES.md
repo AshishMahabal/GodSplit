@@ -127,3 +127,16 @@ Item 2, polish:
 - Phone check at 390px: the ring stacks above the meters, nothing overflows. Headless Chrome can't make a window under 500px, so `shot.sh` narrows the page itself when WIDTH < 500.
 - Feedback link on the ending screen: opens a new GitHub issue prefilled with the run (meters and path). Only works while the repo is public. `FEEDBACK_URL` in index.html.
 - Tests: new `changer` playthrough and a `resume` check. The sim also checks that revealing before a first answer does nothing.
+
+## 2026-11-08: Session 10 (plan item 3: pass-and-play)
+- Start screen: "Play alone" or "Play together on one device (2 to 5 people)". Names are entered once (at least 2, all different).
+- State: `S.players` holds each player's meters, tags, history and seen-assumption records. The ladder (plan, rung, step) is shared. `S.turn` is whose meters the HUD shows. Solo is the same code with one player called "You". Save version is now 2, so older saves are dropped.
+- A round, together: for each player, a "Pass the device to X" screen, then the dilemma in private (first answer, reveals, change, confidence), then a private feedback card ("Hide this and pass on"). Then the room's split, with counts and names for every option, including third ways nobody found. Then each player in turn, on the shared screen, picks the strongest case for another player's real answer: the next player round the table whose answer differs from theirs and is one of the two main options. If nobody differs, a side nobody took.
+- Avatar reveal, together: all players named in front of the room. Each says "that is me" or not. No simulated players.
+- Gate, together: every player needs the doubt for the next rung. Anyone short replays one of their own unexamined dilemmas alone (with a hand-off), and the gate checks again. "The ladder takes all of you or none of you."
+- Sky: the average of the players' progress. Auditor's verdict on that average. Ending lists each player with avatar, meters and rank line. The rank's third way says "Ask the others at the table. They will not agree."
+- The trolley follow-up depends on the room's majority (ties count as pulled). The follow-up text says "A minute ago you pulled it", which won't fit the minority.
+- Tolerance is now capped at its maximum, since replays add steelmen beyond the plan (this could already happen in solo).
+- Footer: "In solo play, other players are simulated for now."
+- Test: `sim.js group` plays 4 players with different styles (one skips looking at first, so the gate holds that player back alone). Checks hand-offs, split counts, steelman targets, reveal and that the run ends.
+- Not done: a timer or a way to stop players peeking, a discussion prompt per dilemma, real-group votes on whose steelman was fairest. Steelmen are still multiple choice.

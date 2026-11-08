@@ -75,6 +75,8 @@ details.help summary{cursor:pointer;color:var(--muted)}
 details.help dl{margin:8px 0 0}
 details.help dt{font-weight:600}
 details.help dd{margin:0 0 6px;color:var(--muted)}
+.split .who{margin:-4px 0 8px;text-align:right}
+.revrow{border-top:1px solid var(--line);padding:8px 0;margin-top:8px}
 footer{margin-top:24px;font-size:12px;color:var(--muted)}
 .others{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0}
 .others span{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
@@ -102,7 +104,7 @@ body.locked .hud,body.locked #rung{display:none}
     </div>
   </div>
   <div id="view"></div>
-  <footer>Prototype M1. Based on the story नैकेश्वर (ऐसी अक्षरे, 2025). Other players are simulated for now.<br>© 2026 Ashish Mahabal · Code: AGPL-3.0 · Content: CC BY-SA 4.0 · No warranty</footer>
+  <footer>Prototype M1. Based on the story नैकेश्वर (ऐसी अक्षरे, 2025). In solo play, other players are simulated for now.<br>© 2026 Ashish Mahabal · Code: AGPL-3.0 · Content: CC BY-SA 4.0 · No warranty</footer>
 </main>
 
 <script src="dilemmas.js"></script>
@@ -180,20 +182,25 @@ const HANDLES = ["mayli_07","yuan.k","aruni","zara-h","sam_r","node-412","gaia-3
 
 // ---------- STATE ----------
 // A run is saved between dilemmas, so closing the tab doesn't lose it.
-const SAVE_KEY = "gs_save", SAVE_V = 1;
-const S = loadSave() || { v:SAVE_V, plan:buildPlan(), rung:0, step:0, doubt:0, tol:0, ego:0, tags:{}, history:[], undoubted:[], replay:null, seenA:{}, seenChange:{}, publicName:null, resume:null };
+// Solo: one player, the others simulated. Group (pass-and-play): 2 to 5 people share one device,
+// each with their own meters. The ladder (plan, rung, step) is shared.
+const SAVE_KEY = "gs_save", SAVE_V = 2;
+function newPlayer(name){ return { name, doubt:0, tol:0, ego:0, tags:{}, history:[], undoubted:[], seenA:{}, seenChange:{}, publicName:null }; }
+const S = loadSave() || { v:SAVE_V, mode:"solo", plan:buildPlan(), rung:0, step:0, players:[newPlayer("You")], turn:0, resume:null };
+const me = () => S.players[S.turn];
+const group = () => S.mode==="group";
 function loadSave(){
   try{
     const x = JSON.parse(store(SAVE_KEY));
     // Drop saves from an older version, or that name dilemmas no longer in the game.
     const ok = id => id==="ADAPT_TROLLEY" || DILEMMAS[id];
-    if(!x || x.v!==SAVE_V || !x.resume || !x.plan.flat().every(ok) || !x.history.every(h=>DILEMMAS[h.id])) return null;
+    if(!x || x.v!==SAVE_V || !x.resume || !x.plan.flat().every(ok) || !x.players.every(p=>p.history.every(h=>DILEMMAS[h.id]))) return null;
     return x;
   }catch(e){ return null; }
 }
 function save(where){ S.resume = where; store(SAVE_KEY, JSON.stringify(S)); }
 function clearSave(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
-let cur = null; // per-dilemma working state
+let cur = null; // the dilemma being played: shared part, plus the private state of whoever's turn it is
 
 // Draw this run's ladder: PER_RUNG dilemmas from each rung's pool, chains kept together, "always" last.
 function buildPlan(){
@@ -209,9 +216,9 @@ function buildPlan(){
   });
 }
 
-// Maximum Doubt and Tolerance in this run. Doubt: 3 per dilemma for exposing every assumption, plus 2 each time
-// exposing them changes your answer, counted for about a quarter of the dilemmas. Exposing alone can't fill the meter.
-// Tolerance: 2 per steelman.
+// Maximum Doubt and Tolerance in this run (per player). Doubt: 3 per dilemma for exposing every assumption, plus 2
+// each time exposing them changes your answer, counted for about a quarter of the dilemmas. Exposing alone can't fill
+// the meter. Tolerance: 2 per steelman.
 const NPLAY = S.plan.reduce((n,r)=>n+r.length,0) + 1;
 const CHANGES = Math.ceil(NPLAY/4);
 const DMAX = 3*NPLAY + 2*CHANGES, TMAX = 2*NPLAY, EGOMAX = 12;
@@ -219,11 +226,13 @@ const DMAX = 3*NPLAY + 2*CHANGES, TMAX = 2*NPLAY, EGOMAX = 12;
 const GATE = S.plan.map((r,i)=>S.plan.slice(0,i+1).reduce((n,x)=>n+x.length,0));
 // The avatar is revealed "now and then" (मधूनमधून): after these rungs (0-based).
 const REVEAL_AFTER = [1,3];
-// Fraction of the sky relit. Full only if the whole ladder is climbed with every doubt and steelman.
-function progress(){
-  const p = 0.5*Math.min(1,S.doubt/DMAX) + 0.5*Math.min(1,S.tol/TMAX) - 0.03*S.ego;
+// One player's share of the sky. Full only if the whole ladder is climbed with every doubt and steelman.
+function progressOf(P){
+  const p = 0.5*Math.min(1,P.doubt/DMAX) + 0.5*Math.min(1,P.tol/TMAX) - 0.03*P.ego;
   return Math.max(0, Math.min(1, p));
 }
+// The sky belongs to everyone playing: in a group it is the average.
+function progress(){ return S.players.reduce((s,P)=>s+progressOf(P),0)/S.players.length; }
 
 // ---------- STARS ----------
 const cv = document.getElementById("sky"), cx = cv.getContext("2d");
@@ -249,25 +258,28 @@ addEventListener("resize", initStars); initStars(); requestAnimationFrame(drawSt
 const V = document.getElementById("view");
 const $ = id => document.getElementById(id);
 const esc = s => s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+// The columns show whoever's turn it is. The ring shows the whole sky.
 function meters(){
+  const P = me();
   const pct = (v,m)=>Math.max(0,Math.min(100,v/m*100))+"%";
-  $("mDoubt").style.height = pct(S.doubt,DMAX); $("vDoubt").innerHTML = `${S.doubt}<small> / ${DMAX}</small>`;
-  $("mTol").style.height = pct(S.tol,TMAX);     $("vTol").innerHTML = `${S.tol}<small> / ${TMAX}</small>`;
+  $("mDoubt").style.height = pct(P.doubt,DMAX); $("vDoubt").innerHTML = `${P.doubt}<small> / ${DMAX}</small>`;
+  $("mTol").style.height = pct(P.tol,TMAX);     $("vTol").innerHTML = `${P.tol}<small> / ${TMAX}</small>`;
   const need = GATE[S.rung];
   $("gDoubt").style.display = need===undefined ? "none" : "";
   if(need!==undefined) $("gDoubt").style.bottom = pct(need,DMAX);
   $("sDoubt").textContent = need===undefined ? "max "+DMAX : `next rung: ${need}`;
   $("sTol").textContent = "max "+TMAX;
-  const [egoCol,egoTxt] = S.ego>=6 ? ["var(--ego-crit)","high"] : S.ego>=3 ? ["var(--ego-warn)","rising"] : ["var(--ego-low)","low"];
-  $("mEgo").style.height = pct(S.ego,EGOMAX); $("mEgo").style.background = egoCol;
-  $("swEgo").style.background = egoCol; $("vEgo").textContent = S.ego; $("egoState").textContent = "· "+egoTxt;
+  const [egoCol,egoTxt] = P.ego>=6 ? ["var(--ego-crit)","high"] : P.ego>=3 ? ["var(--ego-warn)","rising"] : ["var(--ego-low)","low"];
+  $("mEgo").style.height = pct(P.ego,EGOMAX); $("mEgo").style.background = egoCol;
+  $("swEgo").style.background = egoCol; $("vEgo").textContent = P.ego; $("egoState").textContent = "· "+egoTxt;
   const n = lit(), p = progress();
   $("ringFill").setAttribute("stroke-dashoffset", (314.16*(1-p)).toFixed(1));
   $("ringPct").textContent = Math.round(p*100)+"%";
   $("ringN").textContent = `${n} of ${stars.length} stars`;
   const r = RUNGS[S.rung];
   $("rung").textContent = (r ? `Rung ${S.rung+1} of ${RUNGS.length}: ${r.name} (${r.mr})` : "Last step")
-    + (S.publicName ? ` · seen as ${S.publicName}` : "");
+    + (group() ? ` · meters: ${P.name}` : "")
+    + (P.publicName ? ` · seen as ${P.publicName}` : "");
 }
 function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 function labelOf(id, optId){
@@ -277,6 +289,7 @@ function labelOf(id, optId){
 
 // ---------- FLOW ----------
 function start(){
+  S.turn = 0;
   V.innerHTML = `<div class="card">
     <h2>The stars have gone dark.</h2>
     <p>Somewhere, a voice claimed to be the only god, and the universe stopped answering. The Auditor says the stars may return if enough people learn three things: to speak as <i>we</i>, to tolerate views they do not hold, and to let definitions change.</p>
@@ -286,14 +299,34 @@ function start(){
       <dt>Doubt</dt><dd>Grows when you expose what a dilemma assumes, and more when that changes your answer. You need enough of it to climb each rung.</dd>
       <dt>Tolerance</dt><dd>Grows when you find the honest case for a side you didn't choose. Picking a caricature lowers it.</dd>
       <dt>Ego</dt><dd>Keep it low. It grows when you are sure without having looked. Accepting the name the game gives you clears it.</dd>
-      <dt>Stars</dt><dd>The ring shows how much of the sky has come back. It can only fill near the end.</dd></dl></details>
+      <dt>Stars</dt><dd>The ring shows how much of the sky has come back. It can only fill near the end. Playing together, the sky is shared.</dd></dl></details>
     <div class="opts">${S.resume
-      ? `<button class="primary" onclick="resume()">Continue: rung ${Math.min(S.rung+1,RUNGS.length)} of ${RUNGS.length}</button><button onclick="clearSave();location.reload()">Start over</button>`
-      : `<button class="primary" onclick="rungCard()">Begin</button>`}</div></div>`;
+      ? `<button class="primary" onclick="resume()">Continue${group()?` (${S.players.map(p=>esc(p.name)).join(", ")})`:""}: rung ${Math.min(S.rung+1,RUNGS.length)} of ${RUNGS.length}</button><button onclick="clearSave();location.reload()">Start over</button>`
+      : `<button class="primary" onclick="rungCard()">Play alone</button><button onclick="groupSetup()">Play together on one device (2 to 5 people)</button>`}</div></div>`;
   store("gs_help","1");
   meters();
 }
 function resume(){ ({next:nextDilemma, card:rungCard, reveal:avatarReveal, gate:gate})[S.resume](); }
+
+// Pass-and-play: names for 2 to 5 players.
+function groupSetup(){
+  V.innerHTML = `<div class="card">
+    <h2>Play together</h2><div class="mr">लोक एकमेकांशी बोलून खेळत</div>
+    <p>Two to five people, one device. Each of you answers in private. Then the room sees how you split, and each of you makes the case for someone else's answer. Talk as much as you like. You don't have to agree.</p>
+    <form class="lock" onsubmit="groupStart(event)">
+      ${[1,2,3,4,5].map(i=>`<input id="pn${i}" maxlength="20" autocomplete="off" placeholder="Player ${i}${i>2?" (optional)":""}" aria-label="Player ${i} name">`).join("")}
+      <div class="opts"><button class="primary" type="submit">Start</button><button type="button" onclick="start()">Back</button></div>
+    </form><div id="gsfb"></div></div>`;
+}
+function groupStart(e){
+  e.preventDefault();
+  const names = [1,2,3,4,5].map(i=>$("pn"+i).value.trim()).filter(Boolean);
+  if(names.length<2 || new Set(names.map(n=>n.toLowerCase())).size!==names.length){
+    $("gsfb").innerHTML = `<div class="fb no">Enter at least two different names.</div>`; return;
+  }
+  S.mode = "group"; S.players = names.map(newPlayer); S.turn = 0;
+  rungCard();
+}
 
 // Shown at the start of each rung.
 function rungCard(){
@@ -311,8 +344,10 @@ function rungCard(){
 function pickId(){
   let id = S.plan[S.rung][S.step];
   if(id==="ADAPT_TROLLEY"){
-    const t = S.history.find(h=>h.id==="trolley");
-    id = (t && t.choice==="pull") ? "trolleyKin" : "trolleyKin2";
+    // Which follow-up comes depends on the trolley answer. In a group, on the majority's.
+    const t = S.players.map(P=>P.history.find(h=>h.id==="trolley")).filter(Boolean);
+    const pulled = t.filter(h=>h.choice==="pull").length;
+    id = (t.length && pulled*2 >= t.length) ? "trolleyKin" : "trolleyKin2";
   }
   return id;
 }
@@ -322,11 +357,22 @@ function nextDilemma(){
   showDilemma(pickId(), false);
 }
 
-function showDilemma(id, final){
-  const d = DILEMMAS[id];
-  // Option and assumption order change every time, so position gives nothing away.
-  cur = { id, d, final, shown:0, choice:null, conf:null, opts:shuffle(d.options), assume:shuffle(d.assumptions) };
-  renderDilemma();
+// who: the players answering, by index. Everyone, except on a replay.
+function showDilemma(id, final, who){
+  cur = { id, d:DILEMMAS[id], final, who: who || S.players.map((_,i)=>i), k:0, answers:{} };
+  turn();
+}
+// One player's private turn. Option and assumption order change every time, so position gives nothing away.
+function turn(){
+  S.turn = cur.who[cur.k];
+  Object.assign(cur, { shown:0, choice:null, first:null, conf:null, opts:shuffle(cur.d.options), assume:shuffle(cur.d.assumptions) });
+  if(!group()) return renderDilemma();
+  V.innerHTML = `<div class="card center">
+    <div class="sub">${esc(cur.d.title)}</div>
+    <h2>Pass the device to ${esc(me().name)}</h2>
+    <p>${cur.k ? "Everyone else, look away until it comes back." : "Each of you answers in private. The others look away."}</p>
+    <div class="opts"><button class="primary" onclick="renderDilemma()">I am ${esc(me().name)}. Show me</button></div></div>`;
+  meters();
 }
 
 function renderDilemma(){
@@ -334,6 +380,7 @@ function renderDilemma(){
   const assumeHtml = cur.assume.slice(0,cur.shown).map(a=>`<div class="a-item">${esc(a.t)}</div>`).join("");
   const more = cur.shown < cur.assume.length;
   V.innerHTML = `<div class="card">
+    ${group()?`<div class="sub">${esc(me().name)}, in private</div>`:""}
     <h2>${esc(d.title)}</h2><div class="mr">${d.mr}</div>
     ${d.text.split("\n\n").map(t=>`<p>${esc(t)}</p>`).join("")}
     ${d.src?`<div class="src">${esc(d.src)}</div>`:""}
@@ -353,10 +400,10 @@ function renderDilemma(){
 function reveal(){
   if(!cur.choice) return;
   if(!cur.shown) cur.first = cur.choice;
-  const a = cur.assume[cur.shown++];
+  const a = cur.assume[cur.shown++], P = me();
   // Doubt counts once per assumption, so replays can't farm it.
   const key = cur.id+"|"+a.t;
-  if(!S.seenA[key]){ S.seenA[key]=1; S.doubt += 1; }
+  if(!P.seenA[key]){ P.seenA[key]=1; P.doubt += 1; }
   if(a.unlock && !cur.opts.find(o=>o.id===a.unlock.id)) cur.opts.push(a.unlock);
   renderDilemma();
 }
@@ -364,68 +411,128 @@ function choose(id){ cur.choice=id; renderDilemma(); }
 function conf(k){ cur.conf=k; renderDilemma(); }
 
 function commit(){
-  const opt = cur.opts.find(o=>o.id===cur.choice);
-  opt.tags.forEach(t=>S.tags[t]=(S.tags[t]||0)+1);
+  const P = me(), opt = cur.opts.find(o=>o.id===cur.choice);
+  opt.tags.forEach(t=>P.tags[t]=(P.tags[t]||0)+1);
   // Certainty is only costly when nothing (or almost nothing) was examined.
   let egoGain = 0;
-  if(cur.shown===0){ egoGain = {certain:2,leaning:1,unsure:0}[cur.conf]; S.undoubted.push(cur.id); }
+  if(cur.shown===0){ egoGain = {certain:2,leaning:1,unsure:0}[cur.conf]; P.undoubted.push(cur.id); }
   else if(cur.conf==="certain" && cur.shown<2){ egoGain = 1; }
-  S.ego += egoGain;
+  P.ego += egoGain;
   // Changing your answer after exposing its premises is the doubt that counts most: once per dilemma,
   // and for at most CHANGES dilemmas, so changing every answer is not a strategy either.
-  cur.changed = !!(cur.first && cur.choice!==cur.first);
-  cur.counted = cur.changed && !S.seenChange[cur.id] && Object.keys(S.seenChange).length < CHANGES;
-  if(cur.counted){ S.seenChange[cur.id]=1; S.doubt += 2; }
-  S.history.push({id:cur.id, choice:cur.choice, first:cur.first||null, conf:cur.conf, examined:cur.shown});
-  renderSplit(egoGain);
+  const changed = !!(cur.first && cur.choice!==cur.first);
+  const counted = changed && !P.seenChange[cur.id] && Object.keys(P.seenChange).length < CHANGES;
+  if(counted){ P.seenChange[cur.id]=1; P.doubt += 2; }
+  P.history.push({id:cur.id, choice:cur.choice, first:cur.first||null, conf:cur.conf, examined:cur.shown});
+  cur.answers[S.turn] = { choice:cur.choice, msgs:personalMsgs(egoGain, changed, counted) };
+  if(!group()) return renderSplit();
+  // Group: private feedback, then pass on, or show the room how it split.
+  cur.k++;
+  const more = cur.k < cur.who.length;
+  V.innerHTML = `<div class="card">
+    <div class="sub">${esc(P.name)}, in private</div><h2>Your answer is in.</h2>
+    ${cur.answers[S.turn].msgs}
+    <div class="opts"><button class="primary" onclick="${more?"turn()":"roomSplit()"}">${more?"Hide this and pass on":"Show the room how you split"}</button></div></div>`;
+  meters();
+}
+function personalMsgs(egoGain, changed, counted){
+  const why = cur.shown===0 ? "without examining a single assumption" : "after examining only one assumption";
+  return (egoGain>0
+      ? `<div class="fb no">${esc(fill(pick(SAY.egoUp),{n:egoGain,conf:cur.conf,why}))}</div>`
+      : `<div class="fb ok">${esc(pick(cur.shown ? SAY.egoNone : SAY.egoLoose))}</div>`)
+    + (counted ? `<div class="fb ok">${esc(pick(SAY.changed))}</div>` : changed ? `<div class="fb ok">${esc(pick(SAY.changedAgain))}</div>` : "");
 }
 
-function renderSplit(egoGain){
+// The steelman choice: the honest case for the target, one caricature of it, and a decoy that is the good case
+// for a different side, so the honest one can't be spotted by tone or length.
+function makeSteel(own, target){
+  const d = cur.d;
+  const decoyOpt = d.options.find(o=>o.id===own) || d.options.find(o=>o.id!==target.id);
+  const st = d.steel[target.id];
+  cur.target = target;
+  cur.args = shuffle([
+    {t:st.good, kind:"ok"},
+    {t:d.steel[decoyOpt.id].good, kind:"decoy", own:decoyOpt.label},
+    {t:pick(st.bad), kind:"bad"}
+  ]);
+  return `<div class="opts" id="args">${cur.args.map((a,i)=>`<button onclick="steel(${i})">${esc(a.t)}</button>`).join("")}</div><div id="steelfb"></div>`;
+}
+
+// Solo: the split is simulated, and the steelman follows on the same card.
+function renderSplit(){
   const {d} = cur;
   const total = cur.opts.reduce((s,o)=>s+(d.split[o.id]||0),0);
   const rows = cur.opts.map(o=>{
     const p = Math.round((d.split[o.id]||0)/total*100);
     return `<div class="s ${o.id===cur.choice?"me":""}"><div class="lbl">${esc(o.label)}${o.id===cur.choice?" (you)":""}</div><div class="b"><i style="width:${p}%"></i></div><div>${p}%</div></div>`;
   }).join("");
-  const why = cur.shown===0 ? "without examining a single assumption" : "after examining only one assumption";
-  const egoMsg = egoGain>0
-    ? `<div class="fb no">${esc(fill(pick(SAY.egoUp),{n:egoGain,conf:cur.conf,why}))}</div>`
-    : `<div class="fb ok">${esc(pick(cur.shown ? SAY.egoNone : SAY.egoLoose))}</div>`;
-  // Steelman: a main option the player did not choose.
-  const others = d.options.filter(o=>o.id!==cur.choice);
-  const target = pick(others);
-  // Decoy: the best argument for a *different* side, so the honest answer can't be spotted by tone or length.
-  const decoyOpt = d.options.find(o=>o.id===cur.choice) || others.find(o=>o.id!==target.id);
-  const st = d.steel[target.id];
-  const args = shuffle([
-    {t:st.good, kind:"ok"},
-    {t:d.steel[decoyOpt.id].good, kind:"decoy", own:decoyOpt.label},
-    {t:pick(st.bad), kind:"bad"}
-  ]);
-  cur.args = args; cur.target = target;
+  const target = pick(d.options.filter(o=>o.id!==cur.choice));
   V.innerHTML = `<div class="card">
     <h2>The Split</h2><div class="mr">लोक एकमेकांशी बोलून खेळत, पण त्यांचं एकमत होत नसे.</div>
     <div class="split">${rows}</div>
     <p class="note">Simulated players in this prototype.</p>
-    ${egoMsg}
-    ${cur.counted ? `<div class="fb ok">${esc(pick(SAY.changed))}</div>` : cur.changed ? `<div class="fb ok">${esc(pick(SAY.changedAgain))}</div>` : ""}
+    ${cur.answers[S.turn].msgs}
     <div class="assume"><h3>Argue the other side</h3>
       <p>Which is the strongest case for <b>"${esc(target.label)}"</b>?</p>
-      <div class="opts" id="args">${args.map((a,i)=>`<button onclick="steel(${i})">${esc(a.t)}</button>`).join("")}</div>
-      <div id="steelfb"></div>
+      ${makeSteel(cur.choice, target)}
     </div></div>`;
   meters();
 }
 
+// Group: the room's real split, with names. Every option is listed, including third ways nobody found.
+function roomSplit(){
+  const {d} = cur, n = cur.who.length;
+  const all = d.options.concat(d.assumptions.filter(a=>a.unlock).map(a=>a.unlock));
+  const rows = all.map(o=>{
+    const names = cur.who.filter(i=>cur.answers[i].choice===o.id).map(i=>S.players[i].name);
+    const p = Math.round(names.length/n*100);
+    return `<div class="s"><div class="lbl">${esc(o.label)}</div><div class="b"><i style="width:${p}%"></i></div><div>${names.length}</div></div>`
+      + (names.length ? `<div class="note who">${names.map(esc).join(", ")}</div>` : "");
+  }).join("");
+  cur.sk = 0; S.turn = cur.who[0];
+  V.innerHTML = `<div class="card">
+    <h2>The Split</h2><div class="mr">लोक एकमेकांशी बोलून खेळत, पण त्यांचं एकमत होत नसे.</div>
+    <div class="split">${rows}</div>
+    <p class="note">Talk about it. You don't have to agree. Then each of you makes the case for someone else's answer, in front of the others.</p>
+    <div class="opts"><button class="primary" onclick="steelTurn()">Argue the other side</button></div></div>`;
+  meters();
+}
+// Each player, in turn on the shared screen, picks the strongest case for another player's actual answer:
+// the next player round the table whose answer differs from theirs. If nobody differs, a side nobody took.
+function steelTurn(){
+  const i = cur.who[cur.sk], own = cur.answers[i].choice, d = cur.d;
+  S.turn = i;
+  let target = null, by = null;
+  for(let s=1; s<S.players.length && !target; s++){
+    const j = (i+s) % S.players.length, a = cur.answers[j];
+    const o = a && d.options.find(x=>x.id===a.choice && x.id!==own);
+    if(o){ target = o; by = S.players[j].name; }
+  }
+  if(!target) target = pick(d.options.filter(o=>o.id!==own));
+  const whose = by ? `${esc(by)}'s answer` : cur.who.length>1 ? "a side nobody else here took" : "the side you didn't take";
+  V.innerHTML = `<div class="card">
+    <div class="sub">Argue the other side · ${esc(me().name)}</div>
+    <h2>${esc(me().name)}, make the case.</h2>
+    <p>What is the strongest case for <b>"${esc(target.label)}"</b>, ${whose}?</p>
+    ${by ? `<p class="note">${esc(by)}: no hints.</p>` : ""}
+    ${makeSteel(own, target)}</div>`;
+  meters();
+}
+
 function steel(i){
-  const a = cur.args[i];
+  const a = cur.args[i], P = me();
   document.querySelectorAll("#args button").forEach((b,j)=>{ b.disabled=true; if(cur.args[j].kind==="ok") b.classList.add("sel"); });
   let msg;
-  if(a.kind==="ok"){ S.tol += 2; msg = `<div class="fb ok">${esc(pick(SAY.tolOk))}</div>`; }
+  // Capped, because replays add steelmen beyond the plan.
+  if(a.kind==="ok"){ P.tol = Math.min(TMAX, P.tol+2); msg = `<div class="fb ok">${esc(pick(SAY.tolOk))}</div>`; }
   else if(a.kind==="decoy"){ msg = `<div class="fb no">${esc(fill(pick(SAY.tolDecoy),{own:a.own,target:cur.target.label}))} The case for "${esc(cur.target.label)}" is highlighted.</div>`; }
-  else { S.tol = Math.max(0,S.tol-1); msg = `<div class="fb no">${esc(pick(SAY.tolBad))} The honest argument is highlighted.</div>`; }
-  $("steelfb").innerHTML = msg
-    + `<div class="opts"><button class="primary" onclick="afterDilemma()">${cur.final?"Hear the Auditor":"Continue"}</button></div>`;
+  else { P.tol = Math.max(0,P.tol-1); msg = `<div class="fb no">${esc(pick(SAY.tolBad))} The honest argument is highlighted.</div>`; }
+  let next = `<button class="primary" onclick="afterDilemma()">${cur.final?"Hear the Auditor":"Continue"}</button>`;
+  if(group() && cur.sk+1 < cur.who.length){
+    cur.sk++;
+    next = `<button class="primary" onclick="steelTurn()">Next: ${esc(S.players[cur.who[cur.sk]].name)}</button>`;
+  }
+  $("steelfb").innerHTML = msg + `<div class="opts">${next}</div>`;
   meters();
 }
 
@@ -441,13 +548,14 @@ function afterDilemma(){
 }
 
 // ---------- AVATAR REVEAL (public) ----------
-function avatarName(){
-  const top = Object.entries(S.tags).sort((a,b)=>b[1]-a[1])[0];
+function avatarName(P){
+  const top = Object.entries(P.tags).sort((a,b)=>b[1]-a[1])[0];
   return (top && AVATARS[top[0]]) || ["The Unnamed","अनामिक"];
 }
 function avatarReveal(){
-  const [en,mr] = avatarName();
-  S.publicName = `${en} · ${mr}`;
+  if(group()) return roomReveal();
+  const [en,mr] = avatarName(me());
+  me().publicName = `${en} · ${mr}`;
   // Other players get distinct names, never the player's own, shown in both languages like the player's.
   const names = shuffle(Object.values(AVATARS).filter(n=>n[0]!==en));
   const others = shuffle(HANDLES).slice(0,6).map((h,i)=>`<span>${esc(h)}: ${esc(names[i][0])} · ${names[i][1]}</span>`).join("");
@@ -461,14 +569,40 @@ function avatarReveal(){
     <div id="revfb"></div></div>`;
   meters();
 }
-function reveal2(accept){
-  document.querySelectorAll(".row button").forEach(b=>b.disabled=true);
-  const before = S.ego;
+// Group: every avatar is named in front of the room, and each player answers for their own.
+let revealed = {};
+function roomReveal(){
+  revealed = {};
+  S.players.forEach(P=>{ const [en,mr] = avatarName(P); P.publicName = `${en} · ${mr}`; });
+  renderRoomReveal();
+}
+function renderRoomReveal(){
+  const done = S.players.every((_,i)=>i in revealed);
+  V.innerHTML = `<div class="card center">
+    <div class="sub">Avatar reveal · अवताराची ओळख</div>
+    <p>Every avatar must now show its face to the room. Judging by your choices:</p>
+    ${S.players.map((P,i)=>{ const [en,mr] = avatarName(P); return `<div class="revrow">
+      <p class="big"><b>${esc(P.name)}</b>: ${esc(en)} <span class="mr">${mr}</span></p>
+      ${i in revealed ? `<div class="fb ${revealed[i].ok?"ok":"no"}">${esc(revealed[i].msg)}</div>`
+        : `<div class="row"><button onclick="reveal2(true,${i})">Yes, that is me</button><button onclick="reveal2(false,${i})">That is not who I am</button></div>`}
+      </div>`; }).join("")}
+    ${done ? `<div class="opts"><button class="primary" onclick="gate()">Climb</button></div>` : ""}</div>`;
+  meters();
+}
+function reveal2(accept, i){
+  if(group()) S.turn = i;
+  const P = me(), before = P.ego;
   let msg;
   if(accept){
-    S.ego = 0;
+    P.ego = 0;
     msg = before>0 ? fill(pick(SAY.revAccept),{n:before}) : pick(SAY.revAcceptZero);
-  } else { S.ego += 1; msg = pick(SAY.revDeny); }
+  } else { P.ego += 1; msg = pick(SAY.revDeny); }
+  if(group()){
+    revealed[i] = {ok:accept, msg};
+    if(S.players.every((_,j)=>j in revealed)) save("gate");
+    return renderRoomReveal();
+  }
+  document.querySelectorAll(".row button").forEach(b=>b.disabled=true);
   save("gate");
   $("revfb").innerHTML = `<div class="fb ${accept?"ok":"no"}">${esc(msg)}</div>`
     + `<div class="opts"><button class="primary" onclick="gate()">Climb</button></div>`;
@@ -476,47 +610,54 @@ function reveal2(accept){
 }
 
 // ---------- LADDER GATE ----------
+// The ladder takes everyone or no one: anyone short of doubt goes back to a dilemma they answered without looking.
 function gate(){
   const need = GATE[S.rung];
-  if(S.doubt >= need){
-    S.rung++; S.step=0;
+  const behind = S.players.findIndex(P=>P.doubt < need);
+  if(behind<0){
+    S.rung++; S.step=0; S.turn=0;
     save("card");
     return rungCard();
   }
-  const id = S.undoubted.shift() || S.plan[S.rung].filter(x=>DILEMMAS[x])[0];
+  S.turn = behind;
+  const P = me(), who = group() ? esc(P.name) : "you";
+  const id = P.undoubted.shift() || S.plan[S.rung].filter(x=>DILEMMAS[x])[0];
   V.innerHTML = `<div class="card">
-    <h2>The next rung will not hold you.</h2><div class="mr">गृहीतकांवरच शंका</div>
-    <p>To climb, you need <b>${need}</b> doubt. You have <b>${S.doubt}</b>. ${esc(pick(SAY.gate))}</p>
-    <p>Go back to a dilemma you answered without looking under it.</p>
-    <div class="opts"><button class="primary" onclick="replay('${id}')">Return to "${esc(DILEMMAS[id].title)}"</button></div></div>`;
+    <h2>The next rung will not hold ${who}.</h2><div class="mr">गृहीतकांवरच शंका</div>
+    <p>To climb, ${group()?`${who} needs`:"you need"} <b>${need}</b> doubt, and ${group()?"has":"you have"} <b>${P.doubt}</b>. ${esc(pick(SAY.gate))}</p>
+    <p>${group()?"The ladder takes all of you or none of you. ":""}Go back to a dilemma answered without looking under it.</p>
+    <div class="opts"><button class="primary" onclick="replay('${id}')">${group()?`${who}: return`:"Return"} to "${esc(DILEMMAS[id].title)}"</button></div></div>`;
   meters();
 }
-function replay(id){ showDilemma(id,false); cur.isReplay=true; }
+function replay(id){ showDilemma(id, false, [S.turn]); cur.isReplay = true; }
 
 // ---------- ENDING ----------
+function rankLine(P){
+  const h = P.history[P.history.length-1];
+  if(h.choice==="show") return `Rank: ${progressOf(P)>=0.75?"Sage":"Seeker"}.\nNo one reaches "God". That rung was never there.`;
+  if(h.choice==="decline") return `No rank given.`;
+  return group() ? `Ask the others at the table. They will not agree.`
+    : `The others gave you ${3+Math.floor(Math.random()*4)} different ranks. None of them agree.`;
+}
 function ending(){
   clearSave();
-  const h = S.history[S.history.length-1];
-  const p = progress();
-  let rankLine = "";
-  if(h.choice==="show"){
-    rankLine = `Your rank: ${p>=0.75?"Sage":"Seeker"}.\nNo one reaches "God". That rung was never there.`;
-  } else if(h.choice==="decline"){
-    rankLine = `No rank given.`;
-  } else {
-    rankLine = `The others gave you ${3+Math.floor(Math.random()*4)} different ranks. None of them agree.`;
-  }
-  const strong = p >= 0.75;
+  S.turn = 0;
+  const strong = progress() >= 0.75;
+  const P = me();
   V.innerHTML = `<div class="card">
     <div class="sub">A message from the Auditor</div>
     <p class="auditor">${strong
       ? "The claim to divinity is weak.\nEntropy is rebalancing.\nThe audit is complete.\nThe universe will keep talking."
       : "The claim to divinity still stands, a little.\nSome stars answer. Others wait.\nThe audit continues."}</p>
-    <p class="auditor">${esc(rankLine)}</p>
-    <p>Doubt ${S.doubt} · Tolerance ${S.tol} · Ego ${S.ego} · Stars lit ${lit()} of ${stars.length}</p>
+    ${group()
+      ? S.players.map(Q=>`<div class="revrow"><p><b>${esc(Q.name)}</b>${Q.publicName?`, seen as ${esc(Q.publicName)}`:""}</p>
+          <p class="note">Doubt ${Q.doubt} · Tolerance ${Q.tol} · Ego ${Q.ego}</p><p class="auditor">${esc(rankLine(Q))}</p></div>`).join("")
+        + `<p>Stars lit ${lit()} of ${stars.length}, together.</p>`
+      : `<p class="auditor">${esc(rankLine(P))}</p>
+         <p>Doubt ${P.doubt} · Tolerance ${P.tol} · Ego ${P.ego} · Stars lit ${lit()} of ${stars.length}</p>`}
     <p class="note">"आम्ही शेवटी कबूल केलं की, आपण देव न बनू शकतो न बनवू शकतो."</p>
-    <div class="sub" style="margin-top:14px">Your path</div>
-    <p class="note">${S.history.map(x=>`${esc(DILEMMAS[x.id].title)}: ${esc(labelOf(x.id,x.choice))} (${x.conf}, ${x.examined} doubts)`).join("<br>")}</p>
+    ${group() ? "" : `<div class="sub" style="margin-top:14px">Your path</div>
+    <p class="note">${P.history.map(x=>`${esc(DILEMMAS[x.id].title)}: ${esc(labelOf(x.id,x.choice))} (${x.conf}, ${x.examined} doubts)`).join("<br>")}</p>`}
     <div class="opts"><button class="primary" onclick="location.reload()">Play again</button>
       <a class="note" href="${feedbackUrl()}" target="_blank" rel="noopener">Tell us what worked and what didn't (opens a GitHub issue with your path filled in)</a></div></div>`;
   meters();
@@ -524,8 +665,9 @@ function ending(){
 // Beta feedback goes to GitHub issues, prefilled with this run. Needs the repo to be public.
 const FEEDBACK_URL = "https://github.com/ashishmahabal/GodSplit/issues/new";
 function feedbackUrl(){
-  const path = S.history.map(x=>`- ${DILEMMAS[x.id].title}: ${labelOf(x.id,x.choice)} (${x.conf}, ${x.examined} doubts${x.first&&x.first!==x.choice?", changed":""})`).join("\n");
-  const body = `What worked:\n\nWhat didn't:\n\nAnything confusing:\n\n---\nDoubt ${S.doubt}/${DMAX} · Tolerance ${S.tol}/${TMAX} · Ego ${S.ego} · Stars ${lit()}/${stars.length}\n${path}`;
+  const one = P => `${group()?`${P.name}: `:""}Doubt ${P.doubt}/${DMAX} · Tolerance ${P.tol}/${TMAX} · Ego ${P.ego}\n`
+    + P.history.map(x=>`- ${DILEMMAS[x.id].title}: ${labelOf(x.id,x.choice)} (${x.conf}, ${x.examined} doubts${x.first&&x.first!==x.choice?", changed":""})`).join("\n");
+  const body = `What worked:\n\nWhat didn't:\n\nAnything confusing:\n\n---\n${group()?`Played together, ${S.players.length} players. `:""}Stars ${lit()}/${stars.length}\n${S.players.map(one).join("\n\n")}`;
   return FEEDBACK_URL + "?title=" + encodeURIComponent("Beta feedback") + "&body=" + encodeURIComponent(body);
 }
 

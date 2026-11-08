@@ -25,6 +25,8 @@ During beta the game asks for a shared **secret word**. Ask the author for it. T
 
 ## How it plays
 
+Play **alone** (other players are simulated) or **together**: 2 to 5 people on one phone or laptop, passing it round. Each answers in private, the room sees the real split with names, and each player argues for someone else's actual answer. The avatar reveal happens in front of the room, the ladder only lets you climb together, and the sky is shared.
+
 1. **A dilemma.** Two choices, and no answer is scored as right.
 2. **Pick a first answer, then question the premise.** Expose the assumptions the dilemma rests on. Some of them open a third way out. If what you find changes your answer, that counts most.
 3. **Commit, and say how sure you are.** Certainty is free once you have examined the question. Unexamined certainty feeds your **Ego**.
@@ -43,7 +45,7 @@ The three meters follow the Auditor's conditions in the story:
 
 ## Status
 
-Prototype **M1**: 24 dilemmas in 5 rungs (Doors, Bodies, Words, Gods, Mirrors). Each run draws 2 per rung, so ladders differ between plays. One adaptive branch. Other players' choices are simulated. A run is saved between dilemmas in the browser, so it can be continued later.
+Prototype **M1**: 24 dilemmas in 5 rungs (Doors, Bodies, Words, Gods, Mirrors). Each run draws 2 per rung, so ladders differ between plays. One adaptive branch. Solo or pass-and-play for 2 to 5 people. In solo play, other players' choices are simulated. A run is saved between dilemmas in the browser, so it can be continued later.
 English first, with Marathi titles and lines from the story. Aimed at adult players.
 See [DESIGN.md](DESIGN.md) for the full plan and milestones.
 

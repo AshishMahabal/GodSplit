@@ -84,6 +84,7 @@ Writer/curator of dilemmas (the author), a game designer, one web developer, a s
 
 ## 5. Milestones
 
+1. **M1 (pass-and-play), done**: 2 to 5 players on one device. Private turns with a hand-off screen, the room's real split with names, each player steelmans the next player's differing answer (or a side nobody took), a room-wide avatar reveal, a gate that holds back only the players short of doubt (they replay while the others wait), a shared sky (average of players). Brings part of M3 forward without a server.
 1. **M1 (beta polish), done**: scoring change above, a card at the start of each rung, a one-time explanation of the meters, runs saved between dilemmas, phone layout checked, feedback link at the end (GitHub issue, prefilled).
 1. **M1 (part), done**: content in `prototype/dilemmas.js`, 24 dilemmas, 5 rungs drawn at random.
 1. **M0, done**: single-file playable prototype, 10 dilemmas, 3 rungs, public reveal (simulated), gate, steelman with decoys, star ring, Auditor ending.
