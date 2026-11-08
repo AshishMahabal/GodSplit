@@ -1,0 +1,3 @@
+In my story naikeshwar that appeared in aisi akshare last year (see https://aisiakshare.com/node/9377) I describe a game called God Split. If we want to actaully design it, what will be needed? Let us plan and create a prototype.
+
+Maintain notes, commands, prompts.
