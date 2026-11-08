@@ -9,7 +9,7 @@ const errs=[];
 const AVATAR_TAGS=["util","duty","loyal","now","later","world","seeker","reframe","we","stay","switch","continuity","change","self"];
 for(const [id,d] of Object.entries(DILEMMAS)){
   const e=m=>errs.push(`${id}: ${m}`);
-  for(const k of ["title","mr","text"]) if(!d[k]) e(`missing ${k}`);
+  for(const k of ["title","mr","text","src"]) if(!d[k]) e(`missing ${k}`);
   if(d.options?.length!==2) e("needs exactly 2 options");
   if(d.assumptions?.length!==3) e("needs exactly 3 assumptions");
   const unl=(d.assumptions||[]).filter(a=>a.unlock);

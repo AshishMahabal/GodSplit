@@ -102,3 +102,10 @@ English first, adults, story words included but not the limit, reveal shown to e
 - Footer: "Other players are simulated for now." plus "© 2026 Ashish Mahabal · Code: AGPL-3.0 · Content: CC BY-SA 4.0 · No warranty". No source link (repo may go private again).
 - Avatar reveal: the six simulated players now get distinct names, never the player's own, each shown in English and Marathi like the player's. The header's "seen as" also shows both languages. Before, a simulated player could share the player's name and look different because it showed only the English.
 - New test `sim.js reveal` (in test.sh): 500 reveals, checks 6 distinct bilingual names and none equal to the player's.
+
+## 2026-11-08: Session 8
+- Meters now show their scale. Doubt and Tolerance show "value / max" for this run (max = 3 and 2 per planned dilemma, e.g. 36 and 24 for 12 dilemmas). Doubt has a white line at the doubt needed for the next rung, with "next rung: N" above. Ego has no real maximum (the lazy sim reaches 62), so its bar says "full at 12" and has faint lines at 3 (rising) and 6 (high).
+- All 24 dilemma texts rewritten with background, so they make sense to someone who doesn't know the original: who, where, what is at stake. Texts are 2 paragraphs (split on a blank line). The texts avoid giving away the hidden assumptions.
+- New `src` field on every dilemma: one line on where it comes from (Upanishad, Mahabharata book, Plato, Newcomb, the story itself). Shown in small italics under the text. `validate.js` now requires it.
+- The trolley follow-ups now remind you what you did a minute ago ("A minute ago you pulled it").
+- Questions answered: each dilemma always has the same 2 options and 3 assumptions. Only their order, the strawman, the decoy and the feedback wording vary. Variety between runs comes mainly from which dilemmas are drawn.

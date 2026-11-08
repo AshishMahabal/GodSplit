@@ -51,3 +51,14 @@
 
 **User:**
 > lets add the footer without the source link. Also, other players are simulated should be simulated for now. Finally, other players names were shown only in English, and one of them had been the same as the player. The player was shown as english and marathi, so that may have seemed different
+
+## Session 8 (2026-11-08)
+
+**User:**
+> the max height of doubt/tolerance/ego is not known. Also, most questions are rather compact and make sense only to those who already know the dilemmas. We should add proper flesh to those bones
+
+**User:**
+> does each dilemma always have the same options and sets of assumptions? This is just a question, not a request to change
+
+**User:**
+> let me know once done

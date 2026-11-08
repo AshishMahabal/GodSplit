@@ -33,6 +33,11 @@ h1 small{font-size:15px;color:var(--muted);font-weight:400;margin-left:8px}
 .cols{display:flex;gap:18px;flex:1;justify-content:space-around;min-width:240px}
 .col{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;flex:1}
 .col .val{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.col .val small{font-size:12px;font-weight:400;color:var(--muted)}
+.col .vbar .tick{position:absolute;left:-3px;right:-3px;height:2px;background:var(--ink);opacity:.75;z-index:1;transition:bottom .5s}
+.col .vbar .tick.faint{opacity:.35}
+.src{font-size:13px;color:var(--muted);font-style:italic;margin:-4px 0 12px}
+.col .scale{font-size:11px;color:var(--muted);line-height:1.2}
 .col .vbar{width:22px;height:84px;border-radius:4px;position:relative;overflow:hidden}
 .col .vbar i{position:absolute;left:0;right:0;bottom:0;height:0;border-radius:4px 4px 0 0;transition:height .5s,background .3s}
 .col .name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px}
@@ -86,9 +91,9 @@ body.locked .hud,body.locked #rung{display:none}
       <div class="mid"><b id="ringPct">0%</b><span id="ringN">0 of 120 stars</span></div>
     </div>
     <div class="cols">
-      <div class="col"><div class="val" id="vDoubt">0</div><div class="vbar" style="background:var(--doubt-track)"><i id="mDoubt" style="background:var(--doubt)"></i></div><div class="name"><span class="sw" style="background:var(--doubt)"></span>Doubt</div><div class="cap">accepting that definitions evolve</div></div>
-      <div class="col"><div class="val" id="vTol">0</div><div class="vbar" style="background:var(--tol-track)"><i id="mTol" style="background:var(--tol)"></i></div><div class="name"><span class="sw" style="background:var(--tol)"></span>Tolerance</div><div class="cap">of views you don't hold</div></div>
-      <div class="col"><div class="val" id="vEgo">0</div><div class="vbar" style="background:var(--ego-track)"><i id="mEgo"></i></div><div class="name"><span class="sw" id="swEgo"></span>Ego <span id="egoState" class="note"></span></div><div class="cap">keep this low: certainty you never examined</div></div>
+      <div class="col"><div class="val" id="vDoubt">0</div><div class="scale" id="sDoubt"></div><div class="vbar" style="background:var(--doubt-track)" title="The white line is the doubt needed to climb the next rung"><b class="tick" id="gDoubt"></b><i id="mDoubt" style="background:var(--doubt)"></i></div><div class="name"><span class="sw" style="background:var(--doubt)"></span>Doubt</div><div class="cap">accepting that definitions evolve</div></div>
+      <div class="col"><div class="val" id="vTol">0</div><div class="scale" id="sTol"></div><div class="vbar" style="background:var(--tol-track)"><i id="mTol" style="background:var(--tol)"></i></div><div class="name"><span class="sw" style="background:var(--tol)"></span>Tolerance</div><div class="cap">of views you don't hold</div></div>
+      <div class="col"><div class="val" id="vEgo">0</div><div class="scale">full at 12</div><div class="vbar" style="background:var(--ego-track)" title="Lines at 3 (rising) and 6 (high)"><b class="tick faint" style="bottom:25%"></b><b class="tick faint" style="bottom:50%"></b><i id="mEgo"></i></div><div class="name"><span class="sw" id="swEgo"></span>Ego <span id="egoState" class="note"></span></div><div class="cap">keep this low: certainty you never examined</div></div>
     </div>
   </div>
   <div id="view"></div>
@@ -214,8 +219,13 @@ const $ = id => document.getElementById(id);
 const esc = s => s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function meters(){
   const pct = (v,m)=>Math.max(0,Math.min(100,v/m*100))+"%";
-  $("mDoubt").style.height = pct(S.doubt,DMAX); $("vDoubt").textContent = S.doubt;
-  $("mTol").style.height = pct(S.tol,TMAX);     $("vTol").textContent = S.tol;
+  $("mDoubt").style.height = pct(S.doubt,DMAX); $("vDoubt").innerHTML = `${S.doubt}<small> / ${DMAX}</small>`;
+  $("mTol").style.height = pct(S.tol,TMAX);     $("vTol").innerHTML = `${S.tol}<small> / ${TMAX}</small>`;
+  const need = GATE[S.rung];
+  $("gDoubt").style.display = need===undefined ? "none" : "";
+  if(need!==undefined) $("gDoubt").style.bottom = pct(need,DMAX);
+  $("sDoubt").textContent = need===undefined ? "max "+DMAX : `next rung: ${need}`;
+  $("sTol").textContent = "max "+TMAX;
   const [egoCol,egoTxt] = S.ego>=6 ? ["var(--ego-crit)","high"] : S.ego>=3 ? ["var(--ego-warn)","rising"] : ["var(--ego-low)","low"];
   $("mEgo").style.height = pct(S.ego,EGOMAX); $("mEgo").style.background = egoCol;
   $("swEgo").style.background = egoCol; $("vEgo").textContent = S.ego; $("egoState").textContent = "· "+egoTxt;
@@ -271,7 +281,8 @@ function renderDilemma(){
   const more = cur.shown < cur.assume.length;
   V.innerHTML = `<div class="card">
     <h2>${esc(d.title)}</h2><div class="mr">${d.mr}</div>
-    <p>${esc(d.text)}</p>
+    ${d.text.split("\n\n").map(t=>`<p>${esc(t)}</p>`).join("")}
+    ${d.src?`<div class="src">${esc(d.src)}</div>`:""}
     <div class="opts">${cur.opts.map(o=>`<button class="${cur.choice===o.id?"sel":""}" onclick="choose('${o.id}')">${esc(o.label)}</button>`).join("")}</div>
     <div class="sub">How sure are you?</div>
     <div class="row">${[["certain","Certain"],["leaning","Leaning"],["unsure","Unsure"]].map(([k,l])=>`<button class="${cur.conf===k?"sel":""}" onclick="conf('${k}')">${l}</button>`).join("")}</div>

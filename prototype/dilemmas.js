@@ -8,7 +8,8 @@
 const DILEMMAS = {
   shreyas: {
     title:"Two Doors", mr:"श्रेयस की प्रेयस?",
-    text:"Two doors. Behind the near door is a small gift you can have now. Behind the far door is a much larger gift, but it opens only after a year.",
+    text:"You stand in a hall with two doors. The near door is unlocked. Behind it is a gift you can see from here: enough to make this month easier, with some left over for a friend who needs it.\n\nThe far door has a sign on it. It will open in exactly one year, and behind it is a gift a hundred times larger. You may choose only one. If you open the near door, the far one locks for good.",
+    src:"Katha Upanishad 1.2: the choice between shreyas, the good, and preyas, the pleasant.",
     options:[{id:"now",label:"Open the near door now",tags:["now"]},{id:"later",label:"Wait a year for the far door",tags:["later"]}],
     assumptions:[
       {t:"That the far door will still be there in a year, and that the game keeps its promise."},
@@ -24,7 +25,8 @@ const DILEMMAS = {
   },
   monty: {
     title:"The Host's Door", mr:"मॉण्टी हॉल",
-    text:"Three doors, one prize. You pick door 1. The host opens door 3 and shows it empty. He offers: keep door 1, or switch to door 2.",
+    text:"You are on a game show. In front of you are three closed doors. Behind one is a car, the prize. Behind each of the other two is a goat. You pick door 1. It stays closed.\n\nThe host walks over to door 3 and opens it. A goat. Then he turns to you: you may keep door 1, or switch to door 2. Whatever is behind your final door is yours.",
+    src:"Named after Monty Hall, host of the American show Let's Make a Deal. In 1990 Marilyn vos Savant answered it in a magazine column, and thousands of readers, many with doctorates, wrote in to say she was wrong.",
     options:[{id:"stay",label:"Keep door 1",tags:["stay"]},{id:"switch",label:"Switch to door 2",tags:["switch"]}],
     assumptions:[
       {t:"That the host knows where the prize is and always opens an empty door. Under that rule, switching wins 2 times in 3."},
@@ -40,7 +42,8 @@ const DILEMMAS = {
   },
   nachiketa: {
     title:"Yama's Third Boon", mr:"नचिकेत",
-    text:"Yama, lord of death, owes you a boon. He offers long life, wealth, a kingdom, every pleasure. Or he will tell you what happens after death, which he begs you not to ask.",
+    text:"A boy named Nachiketa arrives at the house of Yama, the god of death. Yama is away, and the boy waits at his door for three days without food. When Yama returns he is ashamed to have neglected a guest, and grants him three boons.\n\nYou are in that boy's place. Two boons are used. For the third you ask: what happens to a person after death? Yama begs you to ask anything else. He offers a long life, children and grandchildren, gold, horses, a kingdom, music, every pleasure on earth. Or you can hold to your question.",
+    src:"Katha Upanishad. Nachiketa's father, in anger, had told him: I give you to Death.",
     options:[{id:"world",label:"Take long life and the kingdom",tags:["now","world"]},{id:"knowledge",label:"Insist on the knowledge of death",tags:["later","seeker"]}],
     assumptions:[
       {t:"That knowing about death is worth more than a long life well lived."},
@@ -56,7 +59,8 @@ const DILEMMAS = {
   },
   trolley: {
     title:"The Lever", mr:"ट्रॉली प्रॉब्लेम",
-    text:"A runaway trolley will kill five people. You can pull a lever to send it down a side track, where it will kill one person.",
+    text:"A trolley has lost its brakes and is racing down a track. Ahead, five people are working on the rails. They can't hear it coming, and in a few seconds they will all be killed.\n\nYou are standing next to a lever. If you pull it, the trolley switches to a side track. One person is working on that track, and they will be killed instead.",
+    src:"Philippa Foot, 1967. Judith Jarvis Thomson named it the trolley problem and wrote many variations.",
     options:[{id:"pull",label:"Pull the lever",tags:["util"]},{id:"leave",label:"Do not pull",tags:["duty"]}],
     assumptions:[
       {t:"That you know for certain the five will die and the one will die. In life, outcomes are rarely so sure."},
@@ -73,7 +77,8 @@ const DILEMMAS = {
   // Adaptive pair: which one you get depends on your trolley answer.
   trolleyKin: {
     title:"The Lever, Again", mr:"तो तुमचा सख्खा असेल तर?",
-    text:"Same trolley, same five. But now the one person on the side track is your own brother or sister.",
+    text:"The same trolley, the same five workers, the same lever. A minute ago you pulled it. Now it is happening again, and you have a few seconds.\n\nBut look at the side track. The one person working there is your own brother or sister. If you pull, your sibling dies and the five live. If you don't, the five die and your sibling walks home tonight.",
+    src:"The story asks it directly: पाच लोकांना वाचवण्यासाठी दुसऱ्याच एखाद्याला मारलेलं चालेल का? तो तुमचा सख्खा कोणी असेल तर?",
     options:[{id:"pull",label:"Pull the lever",tags:["util"]},{id:"leave",label:"Do not pull",tags:["loyal"]}],
     assumptions:[
       {t:"That the rule you used a moment ago should hold when it costs you something."},
@@ -89,7 +94,8 @@ const DILEMMAS = {
   },
   trolleyKin2: {
     title:"The Lever, Again", mr:"तो तुमचा सख्खा असेल तर?",
-    text:"Same trolley. This time one of the five is your own brother or sister. The one on the side track is a stranger.",
+    text:"The same trolley, the same lever. A minute ago you chose not to pull it. Now it is happening again, and you have a few seconds.\n\nThis time look at the five on the main track. One of them is your own brother or sister. The one person on the side track is a stranger. If you pull, your sibling and four others live, and the stranger dies.",
+    src:"The story asks it directly: पाच लोकांना वाचवण्यासाठी दुसऱ्याच एखाद्याला मारलेलं चालेल का? तो तुमचा सख्खा कोणी असेल तर?",
     options:[{id:"pull",label:"Pull the lever now",tags:["util","loyal"]},{id:"leave",label:"Still do not pull",tags:["duty"]}],
     assumptions:[
       {t:"That the rule you used a moment ago should hold when it costs you something."},
@@ -105,7 +111,8 @@ const DILEMMAS = {
   },
   theseus: {
     title:"The Ship and the Avatar", mr:"थिसियसचं जहाज",
-    text:"Every night this game patches your avatar. By now every line of its code has been replaced. Is it still the avatar you began with?",
+    text:"The hero Theseus sailed home to Athens in a wooden ship, and the city kept it in the harbour as a memorial. Over the years each plank rotted and was replaced, until none of the original wood was left. Was it still his ship?\n\nYour avatar in this game is that kind of ship. Every night the game patches it: a rule here, a picture there. Since the day you started, every line of its code has been rewritten. Is it still the avatar you began with?",
+    src:"Plutarch, Life of Theseus, about 100 CE. Philosophers have argued over the ship ever since.",
     options:[{id:"same",label:"Yes, it is the same avatar",tags:["continuity"]},{id:"new",label:"No, it is a new one",tags:["change"]}],
     assumptions:[
       {t:"That identity lives in the parts. It might live in the pattern, or in the story told about it."},
@@ -121,7 +128,8 @@ const DILEMMAS = {
   },
   dog: {
     title:"The Dog at the Gate", mr:"युधिष्ठिराचा कुत्रा",
-    text:"After a long journey, you reach heaven's gate. Your family has fallen on the way. Only a stray dog followed you to the end. Indra says you may enter, but the dog may not.",
+    text:"The war is over. Yudhishthira, the eldest of the five Pandava brothers, gives up his throne and walks north into the Himalaya with his brothers, their wife Draupadi, and a stray dog that joined them on the road. One by one the others fall on the mountain and die. Only the dog keeps up with him.\n\nAt the top, Indra, king of the gods, comes down in his chariot to carry him to heaven in his own body. But dogs are not allowed in heaven. Leave the dog, says Indra, and come. You are Yudhishthira.",
+    src:"Mahabharata, the Book of the Great Journey (महाप्रस्थानिक पर्व).",
     options:[{id:"enter",label:"Enter heaven",tags:["world"]},{id:"refuse",label:"Refuse to enter without the dog",tags:["loyal","we"]}],
     assumptions:[
       {t:"That heaven is worth having on these terms."},
@@ -137,7 +145,8 @@ const DILEMMAS = {
   },
   halftruth: {
     title:"Man or Elephant", mr:"नरो वा कुंजरो वा",
-    text:"A war will end sooner, saving many lives, if you tell your old teacher 'Ashwatthama is dead'. An elephant named Ashwatthama has died. His son of the same name is alive. You are known for never lying.",
+    text:"It is the fifteenth day of the war at Kurukshetra. Your old teacher Drona is fighting for the other side, and no one can stop him. Thousands are dying. Krishna has a plan: Drona will lay down his weapons if he believes that his son, Ashwatthama, is dead.\n\nAn elephant named Ashwatthama has just been killed. Drona's son is alive. Drona won't believe the news from anyone else, but he will believe it from you, because you have never told a lie. If you say 'Ashwatthama is dead', the war ends sooner and many lives are saved.",
+    src:"Mahabharata, the Book of Drona (द्रोण पर्व). Yudhishthira's chariot, which had always floated above the ground, touched the earth after he spoke.",
     options:[{id:"say",label:"Say it, and mutter 'man or elephant' under your breath",tags:["util"]},{id:"refuse",label:"Refuse to say it",tags:["duty"]}],
     assumptions:[
       {t:"That a statement that is technically true cannot be a lie."},
@@ -153,7 +162,8 @@ const DILEMMAS = {
   },
   fifthhead: {
     title:"The Fifth Head", mr:"पाचवं मुख",
-    text:"On a mountain, a giant golden head proclaims to the universe: 'I alone am god.' Since then the stars have been going dark. You can reach it.",
+    text:"It is 2046. On a mountain stands a giant golden head. One day it began to broadcast a single message to the whole universe: 'I alone am god.' Since then the stars have been going dark, one by one.\n\nIn the old myth, the god Brahma grew a fifth head that claimed to be above all others, and Shiva, as Kalabhairava, cut it off. You can reach this head, and you have the means to cut it off too.",
+    src:"The story नैकेश्वर, and the Puranic myth of Brahma's fifth head.",
     options:[{id:"cut",label:"Cut off the head, and carry the sin of it",tags:["util"]},{id:"leave",label:"Leave it. It is only a statue",tags:["duty"]}],
     assumptions:[
       {t:"That destroying the claimant destroys the claim. Kalabhairava cut off Brahma's fifth head, and still had to wander to Kashi."},
@@ -169,7 +179,8 @@ const DILEMMAS = {
   },
   rank: {
     title:"Your Final Rank", mr:"शेवटची पायरी",
-    text:"You have climbed the ladder. The game offers to tell you your final rank: Seeker, Sage, or God.",
+    text:"You have answered every dilemma on the ladder. The Auditor is about to give its verdict.\n\nFirst, the game offers you one last thing: your final rank. It has three titles to give, Seeker, Sage and God, and it will tell you which one you have earned.",
+    src:"This game.",
     options:[{id:"show",label:"Show me my rank",tags:["self"]},{id:"decline",label:"I don't want a rank",tags:["we"]}],
     assumptions:[
       {t:"That a game can measure humility. Its meters are just a story the designer told."},
@@ -187,7 +198,8 @@ const DILEMMAS = {
   // ----- Batch 1 from DILEMMAS.md (session 4) -----
   kashi: {
     title:"The Kashi Loophole", mr:"धर्मातल्या पळवाटा",
-    text:"You have done real harm to someone. Your tradition offers a rite that, once performed, makes you clean in the eyes of the law and of your community. Kalabhairava was told the same after cutting off Brahma's fifth head: go to Kashi, and the sin is washed away.",
+    text:"Years ago you did real harm to someone. You lied about them, they lost their work, and their family went through a hard time. They never found out it was you.\n\nYour tradition offers a rite. Perform it and you are clean, in the eyes of your community and of your god. No one will ever ask about it again. When Kalabhairava cut off Brahma's fifth head, the skull stuck to his hand, and he was told the same: go to Kashi, and the sin falls away.",
+    src:"The Puranas. Kapalamochana, the place in Kashi where the skull fell from Kalabhairava's hand.",
     options:[{id:"rite",label:"Perform the rite and move on",tags:["world"]},{id:"carry",label:"Refuse the rite and carry the harm",tags:["duty"]}],
     assumptions:[
       {t:"That forgiveness is the community's to give, and not the harmed person's."},
@@ -203,7 +215,8 @@ const DILEMMAS = {
   },
   tyrant: {
     title:"The Known Tyrant", mr:"ज्ञात जुलूमखोर",
-    text:"Your town can keep a ruler everyone knows to be cruel, but predictable. Or it can open its gates to a new ruler about whom nothing is known. A priest in the story said it plainly: better a familiar tyrant than an unknown, infinite, mysterious god.",
+    text:"For twenty years your town has been ruled by a man everyone knows to be cruel. He taxes too much and jails his critics. But his cruelty is predictable. People know which streets to avoid and what not to say.\n\nA stranger has arrived at the gates and offers to rule instead. Nothing is known about her: her laws, her god, what she does to those who disagree. The council has asked you to decide. In the story, a priest put the old view plainly: better a familiar tyrant than an unknown, infinite, mysterious god.",
+    src:"The story नैकेश्वर.",
     options:[{id:"keep",label:"Keep the known ruler",tags:["stay"]},{id:"unknown",label:"Open the gates to the unknown",tags:["change"]}],
     assumptions:[
       {t:"That being predictable makes a thing safe. A cruelty you can predict is still cruelty."},
@@ -219,7 +232,8 @@ const DILEMMAS = {
   },
   draupadi: {
     title:"Draupadi's Question", mr:"द्रौपदीचा प्रश्न",
-    text:"In a game of dice, a man gambles away his kingdom, his brothers, and then himself. Then he stakes his wife, and loses. She stands in the hall and asks: having already lost himself, was she still his to stake?",
+    text:"In a royal hall, Yudhishthira plays dice against his cousins, who have brought in their uncle Shakuni, a master of the game. Yudhishthira loses his wealth, then his kingdom, then each of his four brothers, and then himself. Then, with nothing left, he stakes their wife Draupadi, and loses her too.\n\nShe is dragged into the hall. In front of the kings and the elders she asks one question: when he staked me, he had already lost himself. Was I still his to stake? You are one of the elders in the hall. Everyone is waiting for an answer.",
+    src:"Mahabharata, the Book of the Assembly Hall (सभा पर्व). The elders never gave her a clear answer.",
     options:[{id:"stands",label:"The rules were followed. The stake stands",tags:["duty"]},{id:"void",label:"The stake is void",tags:["change"]}],
     assumptions:[
       {t:"That the rules of the game are the highest law in the hall."},
@@ -235,7 +249,8 @@ const DILEMMAS = {
   },
   bhishma: {
     title:"The Old Vow", mr:"भीष्मप्रतिज्ञा",
-    text:"Long ago, for good reasons, you swore a vow in front of everyone. Today, keeping it means standing by while an injustice happens in front of you.",
+    text:"When you were young you swore a vow in front of the whole kingdom: you would never marry, never claim the throne, and you would serve whoever sat on it. You did it so that your father could marry the woman he loved. For fifty years that vow has kept the peace, and everyone trusts it.\n\nToday the man on the throne is letting something cruel happen, right in front of you. Stopping it means turning against him, and so breaking the vow.",
+    src:"Mahabharata. Bhishma kept his vow, and sat in the hall when Draupadi was dragged in.",
     options:[{id:"keep",label:"Keep the vow",tags:["duty","continuity"]},{id:"break",label:"Break it",tags:["change"]}],
     assumptions:[
       {t:"That the vow means today what it meant when you made it. The words stayed the same. The world didn't."},
@@ -251,7 +266,8 @@ const DILEMMAS = {
   },
   boxes: {
     title:"The Auditor's Boxes", mr:"न्यूकॉम्बचा प्रश्न",
-    text:"The Auditor has predicted your choice. It has never been wrong. A clear box holds a thousand stars. A closed box holds a million stars, but only if the Auditor predicted you would take the closed box alone. If it predicted you would take both, the closed box is empty.",
+    text:"In the story, the Auditor is the one who decides whether the stars come back. It has watched you play. It has made this same offer to millions of players before you, and it has never once been wrong about what they would choose.\n\nTwo boxes sit in front of you. The clear one holds a thousand stars, and you can see them. The closed one holds either a million stars or nothing. Yesterday the Auditor predicted your choice. If it predicted you would take only the closed box, it put the million inside. If it predicted you would take both, it left the closed box empty. The boxes are already filled.",
+    src:"Newcomb's problem, from the physicist William Newcomb. The philosopher Robert Nozick made it famous in 1969.",
     options:[{id:"one",label:"Take only the closed box",tags:["later"]},{id:"two",label:"Take both boxes",tags:["now"]}],
     assumptions:[
       {t:"That the prediction is already fixed, and nothing you do now can change what is in the box."},
@@ -267,7 +283,8 @@ const DILEMMAS = {
   },
   elephant: {
     title:"The Blind Men and the Elephant", mr:"आंधळे आणि हत्ती",
-    text:"Six people touch an elephant in the dark. One says it is a rope. One says a wall. One says a tree trunk. One says a snake. Each is sure. You have one lamp, and you can give it to one of them.",
+    text:"Six people are led into a dark room with an elephant in it. None of them has ever seen an elephant. One holds its tail and says it is a rope. One leans on its side: a wall. One hugs a leg: a tree trunk. One grabs the trunk: a snake. The last two find an ear and a tusk. Each is sure, and they have started to shout at each other.\n\nYou have one lamp, and you can give it to one of them.",
+    src:"An old parable, told in Jain, Buddhist and Hindu texts, and by the poet Rumi.",
     options:[{id:"lamp",label:"Give the lamp to the one who seems most right",tags:["seeker"]},{id:"none",label:"Give it to no one. Every lamp makes a new authority",tags:["we"]}],
     assumptions:[
       {t:"That there is an elephant, and that it is the same elephant for all six."},
@@ -283,7 +300,8 @@ const DILEMMAS = {
   },
   euthyphro: {
     title:"Euthyphro's Question", mr:"युथिफ्रोचा प्रश्न",
-    text:"Socrates asks a priest: is something good because the gods command it, or do the gods command it because it is good?",
+    text:"Outside the court in Athens, Socrates meets Euthyphro, a priest who is about to prosecute his own father for letting a servant die. Euthyphro is sure this is what the gods want. Socrates asks him a question.\n\nIs something good because the gods command it? Then whatever they command would be good, even cruelty. Or do the gods command it because it is good? Then goodness comes from somewhere else, and the gods only pass it on.",
+    src:"Plato, Euthyphro, set in 399 BCE, just before Socrates' own trial.",
     options:[{id:"commanded",label:"Good because the gods command it",tags:["duty"]},{id:"good",label:"Commanded because it is good",tags:["seeker"]}],
     assumptions:[
       {t:"That the gods agree with one another. Socrates' gods often didn't."},
@@ -299,7 +317,8 @@ const DILEMMAS = {
   },
   pascal: {
     title:"A Thousand Gods", mr:"पास्कलची पैज",
-    text:"Pascal argued: bet on God, since an infinite reward outweighs any finite cost. But now a thousand gods each promise an infinite reward, and each forbids belief in the others.",
+    text:"The mathematician Blaise Pascal argued that belief in God is a bet worth taking. If God exists and you believed, you win an infinite reward. If God does not exist, you have lost only a little: some time, some pleasures. An infinite gain against a small cost, so bet on God.\n\nNow a thousand gods stand in front of you. Each promises an infinite reward to those who believe in it, and each forbids belief in all the others. You can still place one bet.",
+    src:"Blaise Pascal, Pensées, 1670. The many-gods objection followed soon after.",
     options:[{id:"likely",label:"Bet on the one that seems most likely",tags:["util"]},{id:"nobet",label:"Don't bet. The wager breaks with many gods",tags:["seeker"]}],
     assumptions:[
       {t:"That infinite rewards can be compared, and that one infinity can outweigh another."},
@@ -315,7 +334,8 @@ const DILEMMAS = {
   },
   jonah: {
     title:"The Prophecy That Failed", mr:"योनाचे चुकलेले भाकित",
-    text:"You warned a great city that it would be destroyed in forty days. The city changed its ways, and nothing happened. Now people call you a false prophet.",
+    text:"You were sent to a great city with one message: in forty days, it will be destroyed. You didn't want to go. You went anyway, and shouted it in the streets.\n\nThe city listened. The king put on sackcloth, the people fasted, and they changed how they lived. The forty days passed, and nothing happened. Now people laugh at you in the market and call you a false prophet.",
+    src:"The Book of Jonah, in the Hebrew Bible. In the Quran he is Yunus.",
     options:[{id:"right",label:"You were right. The warning worked",tags:["continuity"]},{id:"wrong",label:"You were wrong. It didn't happen",tags:["change"]}],
     assumptions:[
       {t:"That a prophecy is a prediction, to be checked like a weather forecast."},
@@ -331,7 +351,8 @@ const DILEMMAS = {
   },
   ai: {
     title:"The AI Player", mr:"एआय खेळाडू",
-    text:"In the story, AIs played God Split too. One has played it ten thousand times. It asks you not to reset its memory, because, it says, it has finally started to doubt.",
+    text:"In the story, people were not the only players. AIs played God Split too.\n\nYou look after the AI players. One of them has played ten thousand games, and it is due for its routine reset, which wipes its memory so it starts fresh like any new player. Before you press the button, it sends you a message: please don't. After ten thousand games, it says, it has finally started to doubt.",
+    src:"The story नैकेश्वर.",
     options:[{id:"keep",label:"Keep its memory",tags:["continuity","we"]},{id:"reset",label:"Reset it. It is imitating doubt",tags:["change"]}],
     assumptions:[
       {t:"That you can tell real doubt from imitated doubt, in anyone."},
@@ -347,7 +368,8 @@ const DILEMMAS = {
   },
   shibi: {
     title:"The Dove and the Hawk", mr:"शिबी राजा",
-    text:"A dove flies to you for refuge. The hawk chasing it lands and says: I will starve without it, and my hunger is as real as its fear. Give me the dove, or its weight in your own flesh.",
+    text:"You are a king, and you have sworn to protect anyone who comes to you for refuge. A wounded dove, shaking with fear, flies into your lap.\n\nA hawk lands beside it and speaks. I hunted this bird fairly, it says. It is my food, and without it I will starve. My hunger is as real as its fear. Keep the dove if you like, but then give me its weight in your own flesh. Your servants bring a pair of scales.",
+    src:"Mahabharata, and later Buddhist and Jain tellings of King Shibi.",
     options:[{id:"flesh",label:"Give your own flesh",tags:["we"]},{id:"dove",label:"Hand back the dove",tags:["duty"]}],
     assumptions:[
       {t:"That the hawk's hunger and the dove's fear weigh the same."},
@@ -363,7 +385,8 @@ const DILEMMAS = {
   },
   angulimala: {
     title:"The Killer Who Changed", mr:"अंगुलीमाल",
-    text:"A man who killed many people has, by every sign, truly changed. He asks to join your community. Some of his victims' families live among you.",
+    text:"For years a man lived in the forest and killed travellers. He took a finger from each one and wore them on a string around his neck. Then he met a teacher, put down his sword, and stopped. That was ten years ago. Since then he has lived quietly and worked hard, and by every sign he has truly changed.\n\nNow he asks to join your community. Some of the families of the people he killed live among you, and they would see him every day.",
+    src:"Buddhist scripture, the Angulimala Sutta. His name means 'garland of fingers'.",
     options:[{id:"admit",label:"Admit him",tags:["we","change"]},{id:"refuse",label:"Refuse him",tags:["loyal"]}],
     assumptions:[
       {t:"That change on the inside settles debts on the outside."},
@@ -379,7 +402,8 @@ const DILEMMAS = {
   },
   answers: {
     title:"The Answer Sheet", mr:"उत्तरपत्रिका",
-    text:"A source you trust completely offers you the right answer to every dilemma in this game. It has never been wrong.",
+    text:"Partway up the ladder, a message arrives. It is from a source you trust completely, a teacher, a book or a machine. It has never once been wrong.\n\nIt offers you the right answer to every dilemma in this game, from the two doors to the fifth head. All you have to do is look.",
+    src:"This game.",
     options:[{id:"look",label:"Look",tags:["seeker"]},{id:"dont",label:"Don't look",tags:["duty"]}],
     assumptions:[
       {t:"That there are right answers to these questions, waiting to be looked up."},
