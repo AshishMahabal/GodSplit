@@ -17,6 +17,7 @@ Expected: doubter, middle and decoy reach the Auditor ending (only doubter gets 
     tools/shot.sh dog                 # a dilemma by id -> shot.png
     tools/shot.sh dog /tmp/dog.png    # choose the output file
     CHROME=/path/to/chrome tools/shot.sh dog
+    WIDTH=390 tools/shot.sh dog       # phone width (headless Chrome's own minimum is 500px, so the page is narrowed instead)
 
 ## Check meter colours (dataviz skill validator)
     node <dataviz-skill>/scripts/validate_palette.js "#3987e5,#199e70" --mode dark --surface "#151926"

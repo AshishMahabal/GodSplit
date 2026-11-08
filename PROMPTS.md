@@ -68,3 +68,9 @@
 
 **User:**
 > yes, add tools/shot.sh
+
+**User:**
+> this is great so far. Let us plan what will make the game better
+
+**User:**
+> go with your recommendation, 1 and 2 first

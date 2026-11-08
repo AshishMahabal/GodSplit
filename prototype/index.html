@@ -70,6 +70,11 @@ button.primary{background:var(--accent);color:#1a1606;border-color:var(--accent)
 .center{text-align:center}
 .big{font-size:20px}
 .auditor{font-family:ui-monospace,Menlo,monospace;color:var(--accent);white-space:pre-wrap}
+details.help{margin:10px 0;font-size:14px}
+details.help summary{cursor:pointer;color:var(--muted)}
+details.help dl{margin:8px 0 0}
+details.help dt{font-weight:600}
+details.help dd{margin:0 0 6px;color:var(--muted)}
 footer{margin-top:24px;font-size:12px;color:var(--muted)}
 .others{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0}
 .others span{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
@@ -150,6 +155,17 @@ const SAY = {
     "Ego +1. Maybe the name is wrong. But defending a self is also a kind of fifth head.",
     "Ego +1. Everyone still sees the name. Rejecting it only shows you cared.",
     "Ego +1. The name stays public either way. The refusal is what you added."],
+  changed:[
+    "Doubt +2. Looking under the question changed your answer.",
+    "Doubt +2. You let what you found move you.",
+    "Doubt +2. Your first answer did not survive the premise, and you let it go."],
+  changedAgain:[
+    "You changed your answer after looking. The meter has already counted enough changes for this climb.",
+    "Changed again. The meter has stopped counting changes. A mind that always flips is as fixed as one that never does."],
+  rungLine:[
+    "The Auditor is watching the sky, not your answers.",
+    "Nobody below you agreed on the last rung either.",
+    "The rungs are cut from questions. Bring some."],
   gate:[
     "The ladder is made of questions you asked, not answers you gave.",
     "Each rung is cut from a doubt. You have not cut enough of them.",
@@ -163,7 +179,20 @@ const HANDLES = ["mayli_07","yuan.k","aruni","zara-h","sam_r","node-412","gaia-3
                  "bot:ajax","bot:nachi","om.p","anon-88","jiya","theo.s","priya_m","quietdoor"];
 
 // ---------- STATE ----------
-const S = { plan:buildPlan(), rung:0, step:0, doubt:0, tol:0, ego:0, tags:{}, history:[], undoubted:[], replay:null, seenA:{}, publicName:null };
+// A run is saved between dilemmas, so closing the tab doesn't lose it.
+const SAVE_KEY = "gs_save", SAVE_V = 1;
+const S = loadSave() || { v:SAVE_V, plan:buildPlan(), rung:0, step:0, doubt:0, tol:0, ego:0, tags:{}, history:[], undoubted:[], replay:null, seenA:{}, seenChange:{}, publicName:null, resume:null };
+function loadSave(){
+  try{
+    const x = JSON.parse(store(SAVE_KEY));
+    // Drop saves from an older version, or that name dilemmas no longer in the game.
+    const ok = id => id==="ADAPT_TROLLEY" || DILEMMAS[id];
+    if(!x || x.v!==SAVE_V || !x.resume || !x.plan.flat().every(ok) || !x.history.every(h=>DILEMMAS[h.id])) return null;
+    return x;
+  }catch(e){ return null; }
+}
+function save(where){ S.resume = where; store(SAVE_KEY, JSON.stringify(S)); }
+function clearSave(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
 let cur = null; // per-dilemma working state
 
 // Draw this run's ladder: PER_RUNG dilemmas from each rung's pool, chains kept together, "always" last.
@@ -180,9 +209,12 @@ function buildPlan(){
   });
 }
 
-// Maximum Doubt and Tolerance in this run: every planned dilemma (plus the final one) x 3 assumptions, x 2 steelman.
+// Maximum Doubt and Tolerance in this run. Doubt: 3 per dilemma for exposing every assumption, plus 2 each time
+// exposing them changes your answer, counted for about a quarter of the dilemmas. Exposing alone can't fill the meter.
+// Tolerance: 2 per steelman.
 const NPLAY = S.plan.reduce((n,r)=>n+r.length,0) + 1;
-const DMAX = 3*NPLAY, TMAX = 2*NPLAY, EGOMAX = 12;
+const CHANGES = Math.ceil(NPLAY/4);
+const DMAX = 3*NPLAY + 2*CHANGES, TMAX = 2*NPLAY, EGOMAX = 12;
 // Doubt needed to climb past each rung: about one exposed assumption per dilemma so far.
 const GATE = S.plan.map((r,i)=>S.plan.slice(0,i+1).reduce((n,x)=>n+x.length,0));
 // The avatar is revealed "now and then" (मधूनमधून): after these rungs (0-based).
@@ -249,8 +281,30 @@ function start(){
     <h2>The stars have gone dark.</h2>
     <p>Somewhere, a voice claimed to be the only god, and the universe stopped answering. The Auditor says the stars may return if enough people learn three things: to speak as <i>we</i>, to tolerate views they do not hold, and to let definitions change.</p>
     <p>This game is a ladder of dilemmas. None has a scored right answer. To climb, you will have to doubt the game itself.</p>
-    <p class="note">Each round: read, optionally question the premise, choose with a confidence, see how others split, then argue for a side you didn't pick.</p>
-    <div class="opts"><button class="primary" onclick="nextDilemma()">Begin</button></div></div>`;
+    <p class="note">Each round: read, pick a first answer, question the premise, commit with a confidence, see how others split, then argue for a side you didn't pick.</p>
+    <details class="help" ${store("gs_help")?"":"open"}><summary>The three meters</summary><dl>
+      <dt>Doubt</dt><dd>Grows when you expose what a dilemma assumes, and more when that changes your answer. You need enough of it to climb each rung.</dd>
+      <dt>Tolerance</dt><dd>Grows when you find the honest case for a side you didn't choose. Picking a caricature lowers it.</dd>
+      <dt>Ego</dt><dd>Keep it low. It grows when you are sure without having looked. Accepting the name the game gives you clears it.</dd>
+      <dt>Stars</dt><dd>The ring shows how much of the sky has come back. It can only fill near the end.</dd></dl></details>
+    <div class="opts">${S.resume
+      ? `<button class="primary" onclick="resume()">Continue: rung ${Math.min(S.rung+1,RUNGS.length)} of ${RUNGS.length}</button><button onclick="clearSave();location.reload()">Start over</button>`
+      : `<button class="primary" onclick="rungCard()">Begin</button>`}</div></div>`;
+  store("gs_help","1");
+  meters();
+}
+function resume(){ ({next:nextDilemma, card:rungCard, reveal:avatarReveal, gate:gate})[S.resume](); }
+
+// Shown at the start of each rung.
+function rungCard(){
+  const r = RUNGS[S.rung];
+  if(!r) return nextDilemma();
+  V.innerHTML = `<div class="card">
+    <div class="sub">Rung ${S.rung+1} of ${RUNGS.length}</div>
+    <h2>${esc(r.name)}</h2><div class="mr">${r.mr}</div>
+    <p>${esc(r.about)}</p>
+    <p class="auditor">${esc(pick(SAY.rungLine))}</p>
+    <div class="opts"><button class="primary" onclick="nextDilemma()">Climb on</button></div></div>`;
   meters();
 }
 
@@ -287,8 +341,9 @@ function renderDilemma(){
     <div class="sub">How sure are you?</div>
     <div class="row">${[["certain","Certain"],["leaning","Leaning"],["unsure","Unsure"]].map(([k,l])=>`<button class="${cur.conf===k?"sel":""}" onclick="conf('${k}')">${l}</button>`).join("")}</div>
     <div class="assume"><h3>Question the premise</h3>
-      ${assumeHtml || `<p class="note">This dilemma rests on assumptions. You can expose them before you choose.</p>`}
-      ${more ? `<button onclick="reveal()">What is this assuming? (${cur.assume.length-cur.shown} left)</button>` : `<p class="note">All assumptions exposed.</p>`}
+      ${assumeHtml || `<p class="note">This dilemma rests on assumptions. Once you have a first answer, you can expose them.</p>`}
+      ${cur.shown && cur.first ? `<p class="note">Does this change your answer? You can still switch.${cur.choice!==cur.first?` (Your first answer was "${esc(cur.opts.find(o=>o.id===cur.first).label)}".)`:""}</p>` : ""}
+      ${more ? `<button ${cur.choice?"":"disabled"} onclick="reveal()">What is this assuming? (${cur.assume.length-cur.shown} left)</button>` : `<p class="note">All assumptions exposed.</p>`}
     </div>
     <div class="opts"><button class="primary" ${cur.choice&&cur.conf?"":"disabled"} onclick="commit()">Commit</button></div>
   </div>`;
@@ -296,6 +351,8 @@ function renderDilemma(){
 }
 
 function reveal(){
+  if(!cur.choice) return;
+  if(!cur.shown) cur.first = cur.choice;
   const a = cur.assume[cur.shown++];
   // Doubt counts once per assumption, so replays can't farm it.
   const key = cur.id+"|"+a.t;
@@ -314,7 +371,12 @@ function commit(){
   if(cur.shown===0){ egoGain = {certain:2,leaning:1,unsure:0}[cur.conf]; S.undoubted.push(cur.id); }
   else if(cur.conf==="certain" && cur.shown<2){ egoGain = 1; }
   S.ego += egoGain;
-  S.history.push({id:cur.id, choice:cur.choice, conf:cur.conf, examined:cur.shown});
+  // Changing your answer after exposing its premises is the doubt that counts most: once per dilemma,
+  // and for at most CHANGES dilemmas, so changing every answer is not a strategy either.
+  cur.changed = !!(cur.first && cur.choice!==cur.first);
+  cur.counted = cur.changed && !S.seenChange[cur.id] && Object.keys(S.seenChange).length < CHANGES;
+  if(cur.counted){ S.seenChange[cur.id]=1; S.doubt += 2; }
+  S.history.push({id:cur.id, choice:cur.choice, first:cur.first||null, conf:cur.conf, examined:cur.shown});
   renderSplit(egoGain);
 }
 
@@ -346,6 +408,7 @@ function renderSplit(egoGain){
     <div class="split">${rows}</div>
     <p class="note">Simulated players in this prototype.</p>
     ${egoMsg}
+    ${cur.counted ? `<div class="fb ok">${esc(pick(SAY.changed))}</div>` : cur.changed ? `<div class="fb ok">${esc(pick(SAY.changedAgain))}</div>` : ""}
     <div class="assume"><h3>Argue the other side</h3>
       <p>Which is the strongest case for <b>"${esc(target.label)}"</b>?</p>
       <div class="opts" id="args">${args.map((a,i)=>`<button onclick="steel(${i})">${esc(a.t)}</button>`).join("")}</div>
@@ -368,10 +431,13 @@ function steel(i){
 
 function afterDilemma(){
   if(cur.final) return ending();
-  if(cur.isReplay){ return gate(); }
+  if(cur.isReplay){ save("gate"); return gate(); }
   S.step++;
-  if(S.step >= S.plan[S.rung].length) return REVEAL_AFTER.includes(S.rung) ? avatarReveal() : gate();
-  nextDilemma();
+  if(S.step >= S.plan[S.rung].length){
+    if(REVEAL_AFTER.includes(S.rung)){ save("reveal"); return avatarReveal(); }
+    save("gate"); return gate();
+  }
+  save("next"); nextDilemma();
 }
 
 // ---------- AVATAR REVEAL (public) ----------
@@ -403,6 +469,7 @@ function reveal2(accept){
     S.ego = 0;
     msg = before>0 ? fill(pick(SAY.revAccept),{n:before}) : pick(SAY.revAcceptZero);
   } else { S.ego += 1; msg = pick(SAY.revDeny); }
+  save("gate");
   $("revfb").innerHTML = `<div class="fb ${accept?"ok":"no"}">${esc(msg)}</div>`
     + `<div class="opts"><button class="primary" onclick="gate()">Climb</button></div>`;
   meters();
@@ -413,7 +480,8 @@ function gate(){
   const need = GATE[S.rung];
   if(S.doubt >= need){
     S.rung++; S.step=0;
-    return nextDilemma();
+    save("card");
+    return rungCard();
   }
   const id = S.undoubted.shift() || S.plan[S.rung].filter(x=>DILEMMAS[x])[0];
   V.innerHTML = `<div class="card">
@@ -427,6 +495,7 @@ function replay(id){ showDilemma(id,false); cur.isReplay=true; }
 
 // ---------- ENDING ----------
 function ending(){
+  clearSave();
   const h = S.history[S.history.length-1];
   const p = progress();
   let rankLine = "";
@@ -448,8 +517,16 @@ function ending(){
     <p class="note">"आम्ही शेवटी कबूल केलं की, आपण देव न बनू शकतो न बनवू शकतो."</p>
     <div class="sub" style="margin-top:14px">Your path</div>
     <p class="note">${S.history.map(x=>`${esc(DILEMMAS[x.id].title)}: ${esc(labelOf(x.id,x.choice))} (${x.conf}, ${x.examined} doubts)`).join("<br>")}</p>
-    <div class="opts"><button class="primary" onclick="location.reload()">Play again</button></div></div>`;
+    <div class="opts"><button class="primary" onclick="location.reload()">Play again</button>
+      <a class="note" href="${feedbackUrl()}" target="_blank" rel="noopener">Tell us what worked and what didn't (opens a GitHub issue with your path filled in)</a></div></div>`;
   meters();
+}
+// Beta feedback goes to GitHub issues, prefilled with this run. Needs the repo to be public.
+const FEEDBACK_URL = "https://github.com/ashishmahabal/GodSplit/issues/new";
+function feedbackUrl(){
+  const path = S.history.map(x=>`- ${DILEMMAS[x.id].title}: ${labelOf(x.id,x.choice)} (${x.conf}, ${x.examined} doubts${x.first&&x.first!==x.choice?", changed":""})`).join("\n");
+  const body = `What worked:\n\nWhat didn't:\n\nAnything confusing:\n\n---\nDoubt ${S.doubt}/${DMAX} · Tolerance ${S.tol}/${TMAX} · Ego ${S.ego} · Stars ${lit()}/${stars.length}\n${path}`;
+  return FEEDBACK_URL + "?title=" + encodeURIComponent("Beta feedback") + "&body=" + encodeURIComponent(body);
 }
 
 // ---------- BETA SECRET WORD ----------

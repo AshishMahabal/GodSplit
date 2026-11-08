@@ -10,7 +10,8 @@ inline=re.findall(r'<script>(.*?)</script>',page,re.S)[0]
 open('g.js','w').write(open('../prototype/dilemmas.js').read()+'\n'+inline)"
 node --check g.js && echo "syntax ok"
 node validate.js
-for m in doubter middle decoy lazy; do node sim.js $m; done
+for m in doubter changer middle decoy lazy; do node sim.js $m; done
 node sim.js reach
 node sim.js reveal
+node sim.js resume
 rm -f g.js

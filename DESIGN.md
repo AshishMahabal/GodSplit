@@ -35,8 +35,9 @@ Other lines that set the game's purpose:
 ## 3. Core loop (as built in the prototype)
 
 1. **Dilemma** appears with 2 options.
-2. **Question the premise** (optional): reveal hidden assumptions one by one. Some reveal a third, reframing option.
+2. **Pick a first answer, then question the premise** (optional): reveal hidden assumptions one by one. Some reveal a third, reframing option. Revealing is only possible once a first answer is picked.
 3. **Choose** an option and a **confidence** (certain / leaning / unsure).
+   - Doubt: +1 for each assumption exposed (once each), and +2 when the committed answer differs from the first answer. The change bonus counts for at most a quarter of the dilemmas, so exposing everything without ever changing fills about 85% of the Doubt meter, and changing every answer is not a strategy either.
    - Ego rises with confidence, but only if you examined no assumption. Certainty after examination is allowed. (This matters for Monty Hall, which has a real answer under its stated rules.)
 4. **The Split**: see how other players divided (simulated in the prototype).
 5. **Steelman**: pick the strongest argument for an option you did *not* choose, out of three: the honest argument, a strawman (picked from two), and a decoy that is a good argument for a different side. Right pick raises Tolerance, a strawman lowers it, the decoy does neither.
@@ -83,6 +84,7 @@ Writer/curator of dilemmas (the author), a game designer, one web developer, a s
 
 ## 5. Milestones
 
+1. **M1 (beta polish), done**: scoring change above, a card at the start of each rung, a one-time explanation of the meters, runs saved between dilemmas, phone layout checked, feedback link at the end (GitHub issue, prefilled).
 1. **M1 (part), done**: content in `prototype/dilemmas.js`, 24 dilemmas, 5 rungs drawn at random.
 1. **M0, done**: single-file playable prototype, 10 dilemmas, 3 rungs, public reveal (simulated), gate, steelman with decoys, star ring, Auditor ending.
 2. **M1**: content moved to data files, Marathi UI, 25 dilemmas, playtest with 10 people.

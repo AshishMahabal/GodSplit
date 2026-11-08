@@ -425,11 +425,16 @@ const DILEMMAS = {
 // "always" is placed last in that rung on every run.
 const PER_RUNG = 2;
 const RUNGS = [
-  {name:"Doors",   mr:"दारं",   pool:["shreyas","monty","nachiketa","boxes"]},
-  {name:"Bodies",  mr:"देह",    pool:["trolley","shibi","angulimala","dog"]},
-  {name:"Words",   mr:"शब्द",   pool:["halftruth","kashi","draupadi","bhishma"]},
-  {name:"Gods",    mr:"देव",    pool:["tyrant","elephant","euthyphro","pascal"], always:"fifthhead"},
-  {name:"Mirrors", mr:"आरसे",  pool:["theseus","jonah","ai","answers"]},
+  {name:"Doors",   mr:"दारं",   pool:["shreyas","monty","nachiketa","boxes"],
+   about:"Choices about what to take, and when. Every door is a guess about what is behind it, and about who built the door."},
+  {name:"Bodies",  mr:"देह",    pool:["trolley","shibi","angulimala","dog"],
+   about:"Choices that someone's body pays for. The numbers here have faces, and sometimes the face is one you love."},
+  {name:"Words",   mr:"शब्द",   pool:["halftruth","kashi","draupadi","bhishma"],
+   about:"Vows, rites and half-truths. A word can keep its letters and change its meaning."},
+  {name:"Gods",    mr:"देव",    pool:["tyrant","elephant","euthyphro","pascal"], always:"fifthhead",
+   about:"Who gets to say what is true? At the top of this rung, the golden head is waiting."},
+  {name:"Mirrors", mr:"आरसे",  pool:["theseus","jonah","ai","answers"],
+   about:"Who is doing the choosing? You, your avatar, a machine, or the answers someone handed you."},
 ];
 const CHAINS = { trolley:"ADAPT_TROLLEY" };
 const FINAL = "rank";

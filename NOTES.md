@@ -110,3 +110,20 @@ English first, adults, story words included but not the limit, reveal shown to e
 - The trolley follow-ups now remind you what you did a minute ago ("A minute ago you pulled it").
 - Questions answered: each dilemma always has the same 2 options and 3 assumptions. Only their order, the strawman, the decoy and the feedback wording vary. Variety between runs comes mainly from which dilemmas are drawn.
 - Added `tools/shot.sh [dilemma-id] [out.png]`: headless Chrome screenshot of the start screen or any dilemma. Works on a temp copy of the page with transitions off and the secret word skipped, so the real page and the stored word are untouched. The HUD still says Rung 1, whichever dilemma is shown.
+
+## 2026-11-08: Session 9 (plan items 1 and 2)
+Plan agreed with the author (in order): 1 scoring loophole, 2 polish for beta, then 3 pass-and-play group mode, 4 variants and more dilemmas, 5 adaptation by tags, 6 backend and share card.
+
+Item 1, scoring:
+- A first answer must be picked before any assumption can be revealed. After a reveal the page asks "Does this change your answer?".
+- Doubt: +1 per assumption (once each, as before), and +2 if the committed answer differs from the first one (the reframe counts). The +2 counts once per dilemma and for at most CHANGES = ceil(dilemmas/4) dilemmas, so 3 in a 12-dilemma run. DMAX = 3·N + 2·CHANGES (42 for 12).
+- Result (sim): reveal everything and never change = 36/42 Doubt, 111 of 120 stars, still the strong ending if steelmen are right. Reveal and change on a quarter = full sky. Changing every answer gains nothing past the cap, with its own message.
+- Not done: calibration on "knowable" dilemmas. On reflection, no dilemma here has a clean right answer once its assumptions are exposed (even Monty Hall depends on the host's rule, which is the point of its assumptions), so marking "unsure" as wrong would go against the game. Confidence is still only costly when nothing was examined. The loophole is narrowed, not closed. If testers still click through, the next step is a per-rung reveal budget.
+
+Item 2, polish:
+- Rung card at the start of each rung: rung name, a line about it (new `about` field in RUNGS), a line from the Auditor.
+- "The three meters" explanation on the start screen, open on first visit, folded afterwards (`gs_help` in localStorage).
+- Save and resume: the run is saved in localStorage (`gs_save`) at each point between dilemmas, with where to resume (next dilemma, rung card, reveal, gate). Start screen offers Continue or Start over. Saves from an older version, or naming dilemmas no longer in the game, are dropped. The ending clears the save. A dilemma in progress is not saved, it restarts.
+- Phone check at 390px: the ring stacks above the meters, nothing overflows. Headless Chrome can't make a window under 500px, so `shot.sh` narrows the page itself when WIDTH < 500.
+- Feedback link on the ending screen: opens a new GitHub issue prefilled with the run (meters and path). Only works while the repo is public. `FEEDBACK_URL` in index.html.
+- Tests: new `changer` playthrough and a `resume` check. The sim also checks that revealing before a first answer does nothing.

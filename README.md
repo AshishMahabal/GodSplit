@@ -26,8 +26,8 @@ During beta the game asks for a shared **secret word**. Ask the author for it. T
 ## How it plays
 
 1. **A dilemma.** Two choices, and no answer is scored as right.
-2. **Question the premise.** Expose the assumptions the dilemma rests on. Some of them open a third way out.
-3. **Choose, and say how sure you are.** Certainty is free once you have examined the question. Unexamined certainty feeds your **Ego**.
+2. **Pick a first answer, then question the premise.** Expose the assumptions the dilemma rests on. Some of them open a third way out. If what you find changes your answer, that counts most.
+3. **Commit, and say how sure you are.** Certainty is free once you have examined the question. Unexamined certainty feeds your **Ego**.
 4. **The Split.** See how other players divided.
 5. **Argue the other side.** Pick the strongest case for a side you did not choose. One choice is honest, one is a caricature, and one is a good argument for the wrong side.
 6. **Climb.** Each rung of the ladder needs enough doubt. At the end of a rung your avatar is named from your choices and **shown to everyone**.
@@ -37,13 +37,13 @@ The three meters follow the Auditor's conditions in the story:
 
 | Meter | Story | Raised by |
 |---|---|---|
-| Doubt | काळाप्रमाणे व्याख्यांच्या बदलांची स्वीकृती (accepting that definitions change) | exposing assumptions |
+| Doubt | काळाप्रमाणे व्याख्यांच्या बदलांची स्वीकृती (accepting that definitions change) | exposing assumptions, and changing your answer because of them |
 | Tolerance | विरोधाभासी मतांप्रती सहिष्णुता (tolerance of contradictory views) | steelmanning the other side |
 | Ego, kept low | सर्वव्यापी वयंकार (a pervasive sense of "we") | goes up with certainty you never examined, and is cleared by accepting your public avatar |
 
 ## Status
 
-Prototype **M1**: 24 dilemmas in 5 rungs (Doors, Bodies, Words, Gods, Mirrors). Each run draws 2 per rung, so ladders differ between plays. One adaptive branch. Other players' choices are simulated.
+Prototype **M1**: 24 dilemmas in 5 rungs (Doors, Bodies, Words, Gods, Mirrors). Each run draws 2 per rung, so ladders differ between plays. One adaptive branch. Other players' choices are simulated. A run is saved between dilemmas in the browser, so it can be continued later.
 English first, with Marathi titles and lines from the story. Aimed at adult players.
 See [DESIGN.md](DESIGN.md) for the full plan and milestones.
 
