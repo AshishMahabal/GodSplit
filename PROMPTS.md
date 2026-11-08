@@ -109,3 +109,15 @@
 
 **User:**
 > yes, raise trolley to 1 in 4. We will wait for reports back from 2-3 people
+
+**User:**
+> ok. update notes. we quit for now
+
+**User:**
+> one thing before we quit. The following wording is like in a CS paper: "Go back to a dilemma answered without looking under it." To me it reads: go back to the dilemma, and do not look under it". What would be an english english wording?
+
+**User:**
+> the longer alternative is better. Can you check other places where things are similarly ambiguous?
+
+**User:**
+> apply all of them

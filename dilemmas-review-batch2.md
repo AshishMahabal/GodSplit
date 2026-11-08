@@ -21,7 +21,7 @@ You have just woken up. You don't know what day it is, and you remember no earli
 **Hidden assumptions**
 - That chance means one thing here. It could be about the coin, or about this waking.
 - That waking up tells you nothing new. You knew you would wake, whatever the coin did.
-- That the question has one answer before anyone says what the answer is for.
+- That the question has one answer, whatever the answer will be used for.
   - Unlocks third way: Ask what you will be paid for being right, and answer that (15% simulated)
 
 **Arguments**
@@ -471,7 +471,7 @@ A devout friend of yours begins to fast one more day each month. They pray a lit
 **Hidden assumptions**
 - That 'fanatic' is a fact about a person, and not a judgement made by someone.
 - That a word with no sharp edge is useless. You can't say when day becomes night, but you know noon from midnight.
-- That the line is there to be found, by no one in particular.
+- That the line is simply there to be found, and nobody has to draw it.
   - Unlocks third way: Ask who gets to draw the line (25% simulated)
 
 **Arguments**
@@ -531,7 +531,7 @@ The committee has argued for months and handed you two drafts. One lists our gre
 **Hidden assumptions**
 - That anyone is listening, and that the message is for them and not for us.
 - That one message can speak for eight billion people. Nobody elected you.
-- That what we have to say is a statement.
+- That what we have to say has to be a statement.
   - Unlocks third way: Send a question instead (51% simulated)
 
 **Arguments**

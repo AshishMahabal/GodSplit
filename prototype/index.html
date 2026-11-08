@@ -123,7 +123,7 @@ const AVATARS = {
 // Feedback is drawn at random so players can't learn the mechanism from fixed phrases.
 const SAY = {
   egoNone:[
-    "No ego gained. You looked under the floor before you stood on it.",
+    "No ego gained. You checked the floor before you stood on it.",
     "No ego gained. You checked what the question was resting on.",
     "Your certainty was earned, so it costs nothing."],
   egoLoose:[
@@ -131,9 +131,9 @@ const SAY = {
     "No ego gained. An unsure answer claims little.",
     "Nothing added. You didn't claim more than you knew."],
   egoUp:[
-    "Ego +{n}. You were {conf} {why}.",
-    "Ego +{n}. A {conf} answer, {why}.",
-    "Ego +{n}. That was {conf}, {why}."],
+    "Ego +{n}. You said \"{conf}\" {why}.",
+    "Ego +{n}. An answer marked \"{conf}\", {why}.",
+    "Ego +{n}. You marked that \"{conf}\", {why}."],
   tolOk:[
     "Tolerance +2. Someone could hold that view in good faith.",
     "Tolerance +2. You found the case its best defenders would make.",
@@ -159,9 +159,9 @@ const SAY = {
     "Ego +1. Everyone still sees the name. Rejecting it only shows you cared.",
     "Ego +1. The name stays public either way. The refusal is what you added."],
   changed:[
-    "Doubt +2. Looking under the question changed your answer.",
+    "Doubt +2. Seeing what the question assumes changed your answer.",
     "Doubt +2. You let what you found move you.",
-    "Doubt +2. Your first answer did not survive the premise, and you let it go."],
+    "Doubt +2. Your first answer did not survive a look at its premise, and you let it go."],
   changedAgain:[
     "You changed your answer after looking. The meter has already counted enough changes for this climb.",
     "Changed again. The meter has stopped counting changes. A mind that always flips is as fixed as one that never does."],
@@ -174,12 +174,12 @@ const SAY = {
     "You were {prev} last time. Something in your choices has shifted since then.",
     "Last time the network saw {prev}. What changed?"],
   sameName:[
-    "The same name as last time. Has anything moved underneath it?",
+    "The same name as last time. Have your reasons changed, even if the name hasn't?",
     "Still this name. Is that steadiness, or habit?",
     "The name has held since the last reveal. Has it held for the same reasons?"],
   rungLine:[
     "The Auditor is watching the sky, not your answers.",
-    "Nobody below you agreed on the last rung either.",
+    "Nobody agreed on the last rung either.",
     "The rungs are cut from questions. Bring some."],
   gate:[
     "The ladder is made of questions you asked, not answers you gave.",
@@ -377,13 +377,13 @@ function start(){
   V.innerHTML = `<div class="card">
     <h2>The stars have gone dark.</h2>
     <p>Somewhere, a voice claimed to be the only god, and the universe stopped answering. The Auditor says the stars may return if enough people learn three things: to speak as <i>we</i>, to tolerate views they do not hold, and to let definitions change.</p>
-    <p>This game is a ladder of dilemmas. None has a scored right answer. To climb, you will have to doubt the game itself.</p>
-    <p class="note">Each round: read, pick a first answer, question the premise, commit with a confidence, see how others split, then argue for a side you didn't pick.</p>
+    <p>This game is a ladder of dilemmas. No answer is scored as right. To climb, you will have to doubt the game itself.</p>
+    <p class="note">Each round: read, pick a first answer, question the premise, commit and say how sure you are, see how others answered, then argue for a side you didn't pick.</p>
     <details class="help" ${store("gs_help")?"":"open"}><summary>The three meters</summary><dl>
       <dt>Doubt</dt><dd>Grows when you expose what a dilemma assumes, and more when that changes your answer. You need enough of it to climb each rung.</dd>
       <dt>Tolerance</dt><dd>Grows when you find the honest case for a side you didn't choose. Picking a caricature lowers it.</dd>
-      <dt>Ego</dt><dd>Keep it low. It grows when you are sure without having looked. Accepting the name the game gives you clears it.</dd>
-      <dt>Stars</dt><dd>The ring shows how much of the sky has come back. It can only fill near the end. Playing together, the sky is shared.</dd></dl></details>
+      <dt>Ego</dt><dd>Keep it low. It grows when you are sure of an answer you haven't questioned. Accepting the name the game gives you clears it.</dd>
+      <dt>Stars</dt><dd>The ring shows how much of the sky has come back. It can only fill near the end. If you play together, you share the sky.</dd></dl></details>
     <div class="opts">${S.resume
       ? `<button class="primary" onclick="resume()">Continue${group()?` (${S.players.map(p=>esc(p.name)).join(", ")})`:""}: rung ${Math.min(S.rung+1,RUNGS.length)} of ${RUNGS.length}</button><button onclick="clearSave();location.reload()">Start over</button>`
       : `<button class="primary" onclick="rungCard()">Play alone</button><button onclick="groupSetup()">Play together on one device (2 to 5 people)</button>`}</div></div>`;
@@ -523,7 +523,7 @@ function commit(){
   V.innerHTML = `<div class="card">
     <div class="sub">${esc(P.name)}, in private</div><h2>Your answer is in.</h2>
     ${cur.answers[S.turn].msgs}
-    <div class="opts"><button class="primary" onclick="${more?"turn()":"roomSplit()"}">${more?"Hide this and pass on":"Show the room how you split"}</button></div></div>`;
+    <div class="opts"><button class="primary" onclick="${more?"turn()":"roomSplit()"}">${more?"Hide this and pass the device on":"Show the room how you split"}</button></div></div>`;
   meters();
 }
 function personalMsgs(egoGain, changed, counted){
@@ -605,7 +605,7 @@ function steelTurn(){
     <div class="sub">Argue the other side · ${esc(me().name)}</div>
     <h2>${esc(me().name)}, make the case.</h2>
     <p>What is the strongest case for <b>"${esc(target.label)}"</b>, ${whose}?</p>
-    ${by ? `<p class="note">${esc(by)}: no hints.</p>` : ""}
+    ${by ? `<p class="note">${esc(by)}, no hints, please.</p>` : ""}
     ${makeSteel(own, target)}</div>`;
   meters();
 }
@@ -719,8 +719,8 @@ function gate(){
   const id = P.undoubted.shift() || S.plan[S.rung].filter(x=>DILEMMAS[x])[0];
   V.innerHTML = `<div class="card">
     <h2>The next rung will not hold ${who}.</h2><div class="mr">गृहीतकांवरच शंका</div>
-    <p>To climb, ${group()?`${who} needs`:"you need"} <b>${need}</b> doubt, and ${group()?"has":"you have"} <b>${P.doubt}</b>. ${esc(pick(SAY.gate))}</p>
-    <p>${group()?"The ladder takes all of you or none of you. ":""}Go back to a dilemma answered without looking under it.</p>
+    <p>To climb, ${group()?`${who} needs`:"you need"} <b>${need}</b> Doubt, and ${group()?"has":"you have"} <b>${P.doubt}</b>. ${esc(pick(SAY.gate))}</p>
+    <p>${group()?"The ladder takes all of you or none of you. ":""}Go back to one you answered too quickly, and this time look at what it assumes.</p>
     <div class="opts"><button class="primary" onclick="replay('${id}')">${group()?`${who}: return`:"Return"} to "${esc(dilemmaOf(id).title)}"</button></div></div>`;
   meters();
 }

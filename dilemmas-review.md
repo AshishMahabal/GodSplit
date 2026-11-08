@@ -18,7 +18,7 @@ Two boxes sit in front of you. The clear one holds a thousand stars, and you can
 
 **Hidden assumptions**
 - That the prediction is already fixed, and nothing you do now can change what is in the box.
-- That never wrong so far means cannot be wrong.
+- That never having been wrong means it can't be wrong.
 - That you have to choose before you understand the predictor.
   - Unlocks third way: Ask the Auditor how it predicts, before choosing (7% simulated)
 

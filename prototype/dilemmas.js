@@ -272,7 +272,7 @@ const DILEMMAS = {
     options:[{id:"one",label:"Take only the closed box",tags:["later"]},{id:"two",label:"Take both boxes",tags:["now"]}],
     assumptions:[
       {t:"That the prediction is already fixed, and nothing you do now can change what is in the box."},
-      {t:"That never wrong so far means cannot be wrong."},
+      {t:"That never having been wrong means it can't be wrong."},
       {t:"That you have to choose before you understand the predictor.",
        unlock:{id:"askhow",label:"Ask the Auditor how it predicts, before choosing",tags:["reframe"]}}
     ],
@@ -429,7 +429,7 @@ const DILEMMAS = {
     assumptions:[
       {t:"That chance means one thing here. It could be about the coin, or about this waking."},
       {t:"That waking up tells you nothing new. You knew you would wake, whatever the coin did."},
-      {t:"That the question has one answer before anyone says what the answer is for.",
+      {t:"That the question has one answer, whatever the answer will be used for.",
        unlock:{id:"pay",label:"Ask what you will be paid for being right, and answer that",tags:["reframe"]}}
     ],
     split:{half:38,third:47,pay:15},
@@ -687,7 +687,7 @@ const DILEMMAS = {
     assumptions:[
       {t:"That 'fanatic' is a fact about a person, and not a judgement made by someone."},
       {t:"That a word with no sharp edge is useless. You can't say when day becomes night, but you know noon from midnight."},
-      {t:"That the line is there to be found, by no one in particular.",
+      {t:"That the line is simply there to be found, and nobody has to draw it.",
        unlock:{id:"who",label:"Ask who gets to draw the line",tags:["reframe"]}}
     ],
     split:{line:37,slope:38,who:25},
@@ -722,7 +722,7 @@ const DILEMMAS = {
     assumptions:[
       {t:"That anyone is listening, and that the message is for them and not for us."},
       {t:"That one message can speak for eight billion people. Nobody elected you."},
-      {t:"That what we have to say is a statement.",
+      {t:"That what we have to say has to be a statement.",
        unlock:{id:"question",label:"Send a question instead",tags:["reframe","seeker"]}}
     ],
     split:{best:30,sorry:19,question:51},
@@ -960,7 +960,7 @@ const VARIANTS = {
 const AXES = [
   {a:["duty"],              b:["util"],             words:["the rule","the result"]},
   {a:["continuity","stay"], b:["change","switch"],  words:["holding on","letting go"]},
-  {a:["loyal"],             b:["we"],               words:["your own","the many"]},
+  {a:["loyal"],             b:["we"],               words:["your own people","the many"]},
   {a:["now","world"],       b:["later","seeker"],   words:["what you can have now","what you don't yet know"]},
 ];
 
