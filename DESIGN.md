@@ -83,6 +83,7 @@ Writer/curator of dilemmas (the author), a game designer, one web developer, a s
 
 ## 5. Milestones
 
+1. **M1 (part), done**: content in `prototype/dilemmas.js`, 24 dilemmas, 5 rungs drawn at random.
 1. **M0, done**: single-file playable prototype, 10 dilemmas, 3 rungs, public reveal (simulated), gate, steelman with decoys, star ring, Auditor ending.
 2. **M1**: content moved to data files, Marathi UI, 25 dilemmas, playtest with 10 people.
 3. **M2**: real split counts via a small backend, shareable result card.

@@ -21,3 +21,18 @@
 
 **User:**
 > I will keep committing peridically. Story text on github for now is file. aisi was open in any case. we will turn on pages after we have finessed things a bit. For beta testing I wonder if we should need a password (perhaps shared - more like a secret word). Did you add questions, words, etc? or is it the same set of questions for now?
+
+## Session 3 (2026-11-07)
+
+**User:**
+> the repo is private. I can have pages while it stays private. So lets add the secret word. Do propose a host of other questions/dilemmas in line with the kind of things godsplit needs. Should that be a separate md file?
+
+## Session 4 (2026-11-08)
+
+**User:**
+> I made a few mods, in particular to the marathi titles you had. Otherwise they look good. Go for it.
+
+## Session 5 (2026-11-08)
+
+**User:**
+> I have made GodSplit temporarily public. How can I take people directly to the game when they go to the github io pages?

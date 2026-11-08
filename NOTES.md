@@ -65,3 +65,30 @@ English first, adults, story words included but not the limit, reveal shown to e
 - GitHub Pages: turn on later, after polishing.
 - Open: should beta testing need a shared password (secret word)? The repo is public, so a password on the page only keeps out casual visitors. See the options in the session 2 discussion: client-side secret word, or real access control via a host such as Cloudflare Pages with Access.
 - Content is still the original 10 dilemmas. Session 2 added only feedback wording pools and decoy arguments (reusing existing text).
+
+## 2026-11-07: Session 3
+- Repo is private. Author will use GitHub Pages while it stays private. Note: Pages from a private repo needs a paid plan, and the published site is still public to anyone with the URL (unless on Enterprise Cloud with private Pages). So the secret word is a casual gate. The game's text can be read via view-source.
+- Added the beta secret word gate. Only an FNV-1a hash is stored (`SECRET_HASH`). Set it with `python3 tools/set_secret.py <word>`. Once entered, the browser remembers it (localStorage `gs_word`). Changing the word logs everyone out.
+- **The word is currently a placeholder ("test word"). Set the real one before Pages goes live.**
+- `tools/test.sh` now checks the gate: lock screen shows first, a wrong word keeps it locked, and (if `GS_WORD` is set) the right word opens it.
+- Wrote `DILEMMAS.md`: 35 proposed dilemmas in four groups (story world, Indian traditions, other traditions, decision theory and modern), a proposed 5-rung structure (Doors, Bodies, Words, Gods, Mirrors) with random draws per rung, and a suggested first batch of 10. Waiting for the author's keep/change/drop review before building them.
+
+## 2026-11-08: Session 4
+- Author reviewed DILEMMAS.md: all kept, Marathi titles corrected. Go-ahead to build.
+- Content moved out of the page into `prototype/dilemmas.js` (loaded with a plain script tag, so it still works from file://).
+- Built 13 new dilemmas: the suggested ten plus Shibi and Angulimala (Bodies pool had only the trolley pair and the dog) and the Answer Sheet (Mirrors). Wrote one honest argument and two caricatures per side for each. These need the author's read.
+- Ladder is now 5 rungs (Doors, Bodies, Words, Gods, Mirrors). Each run draws 2 per rung from its pool. The trolley and its adaptive sequel stay together and use both Bodies slots. The Fifth Head always closes the Gods rung. Then the Final Rank. 12 dilemmas per run in total (10 before).
+- Doubt and Tolerance maxima are now computed from the run's plan (3 and 2 per dilemma), so the sky still fills only at the very end.
+- Gate needs Doubt equal to the number of dilemmas played so far (about one assumption each).
+- Avatar reveal now only after rungs 2 and 4 ("मधूनमधून", now and then), not after every rung. Rungs without a reveal go straight to the gate.
+- Tests: `tools/validate.js` checks every dilemma's structure (2 options, 3 assumptions with exactly one unlock, split for every option, steel arguments, known tags, no em dashes) and that every dilemma sits in some pool. `sim.js reach` checks every dilemma can be drawn. All pass.
+- The secret word has been changed by the author (hash no longer the placeholder).
+
+### Open
+- Climbing a rung with no reveal has no "you climbed" moment. Might want a short transition card naming the next rung.
+- PER_RUNG = 2 gives 12 dilemmas a run. 3 per rung would give 17. Author's call after playtesting.
+
+## 2026-11-08: Session 5
+- Repo made public (temporarily) by the author, with GitHub Pages.
+- Added top-level `index.html` that redirects to `prototype/` (meta refresh, JS redirect, and a plain link). Relative path, so it works under `/GodSplit/`. Checked with a local server: root, `prototype/` and `prototype/dilemmas.js` all serve, and the root lands on the secret word screen.
+- At the time, sessions 2 to 4 were not yet committed. `prototype/dilemmas.js` must be committed together with `prototype/index.html`, or the online game breaks.

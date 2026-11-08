@@ -67,6 +67,8 @@ button.primary{background:var(--accent);color:#1a1606;border-color:var(--accent)
 footer{margin-top:24px;font-size:12px;color:var(--muted)}
 .others{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0}
 .others span{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+body.locked .hud,body.locked #rung{display:none}
+.lock input{font:inherit;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0b0d14;color:var(--ink);margin:6px 0}
 @media (max-width:520px){.hud{justify-content:center}.split .s .lbl{flex-basis:50%}}
 </style>
 </head>
@@ -89,201 +91,12 @@ footer{margin-top:24px;font-size:12px;color:var(--muted)}
     </div>
   </div>
   <div id="view"></div>
-  <footer>Prototype M0. Based on the story नैकेश्वर (ऐसी अक्षरे, 2025). "Other players" figures are simulated.</footer>
+  <footer>Prototype M1. Based on the story नैकेश्वर (ऐसी अक्षरे, 2025). "Other players" figures are simulated.</footer>
 </main>
 
+<script src="dilemmas.js"></script>
 <script>
-// ---------- CONTENT ----------
-// Each dilemma: options carry tags (used for avatar reveal and adaptation).
-// assumptions: hidden premises; one may unlock a reframing option.
-// split: simulated % of other players per option id.
-// steel: for each main option, one honest argument and two strawmen.
-const DILEMMAS = {
-  shreyas: {
-    title:"Two Doors", mr:"श्रेयस की प्रेयस?",
-    text:"Two doors. Behind the near door is a small gift you can have now. Behind the far door is a much larger gift, but it opens only after a year.",
-    options:[{id:"now",label:"Open the near door now",tags:["now"]},{id:"later",label:"Wait a year for the far door",tags:["later"]}],
-    assumptions:[
-      {t:"That the far door will still be there in a year, and that the game keeps its promise."},
-      {t:"That you, a year from now, will want what you want today."},
-      {t:"That the larger gift is the better one. The Katha Upanishad's shreyas is the good, and preyas the pleasant. Size was never the test.",
-       unlock:{id:"ask",label:"Ask what each gift does to the one who takes it",tags:["reframe"]}}
-    ],
-    split:{now:41,later:52,ask:7},
-    steel:{
-      now:{good:"A promise a year away carries risk, and a gift you can use now may also help someone now.",bad:["People who take the near door just lack self-control.","The near door is closer, so it must be the right one."]},
-      later:{good:"Waiting lets a small sacrifice now become a much larger good, if the promise holds.",bad:["People who wait are just greedy for more.","Bigger numbers always win."]}
-    }
-  },
-  monty: {
-    title:"The Host's Door", mr:"मॉण्टी हॉल",
-    text:"Three doors, one prize. You pick door 1. The host opens door 3 and shows it empty. He offers: keep door 1, or switch to door 2.",
-    options:[{id:"stay",label:"Keep door 1",tags:["stay"]},{id:"switch",label:"Switch to door 2",tags:["switch"]}],
-    assumptions:[
-      {t:"That the host knows where the prize is and always opens an empty door. Under that rule, switching wins 2 times in 3."},
-      {t:"That the host always makes this offer. A host who offers a switch only when you picked right is trying to trick you."},
-      {t:"That the host opened door 3 on purpose. If he opened a door at random and it happened to be empty, staying and switching are 50/50.",
-       unlock:{id:"askhost",label:"Ask the host what rule he follows before deciding",tags:["reframe"]}}
-    ],
-    split:{stay:58,switch:37,askhost:5},
-    steel:{
-      stay:{good:"If the host only offers a switch when your first pick is right, staying is the safe play.",bad:["Switching is for people who can't commit.","Your first instinct is always right."]},
-      switch:{good:"Under the standard rules your first pick wins 1 in 3, and the other closed door carries the remaining 2 in 3.",bad:["Switching is more exciting.","The host is always lying, so do the opposite."]}
-    }
-  },
-  nachiketa: {
-    title:"Yama's Third Boon", mr:"नचिकेत",
-    text:"Yama, lord of death, owes you a boon. He offers long life, wealth, a kingdom, every pleasure. Or he will tell you what happens after death, which he begs you not to ask.",
-    options:[{id:"world",label:"Take long life and the kingdom",tags:["now","world"]},{id:"knowledge",label:"Insist on the knowledge of death",tags:["later","seeker"]}],
-    assumptions:[
-      {t:"That knowing about death is worth more than a long life well lived."},
-      {t:"That Yama's answer would be something you can understand or use."},
-      {t:"That the boon is yours alone. A kingdom touches many people. A secret may touch only you.",
-       unlock:{id:"share",label:"Ask for a boon that serves the people of the kingdom",tags:["reframe","we"]}}
-    ],
-    split:{world:34,knowledge:58,share:8},
-    steel:{
-      world:{good:"A long life and a kingdom can do real good for real people, while the secret may change nothing in the world.",bad:["Only shallow people want a kingdom.","Knowledge is useless, so always take the money."]},
-      knowledge:{good:"Every gift Yama offers ends with death anyway, so understanding death is the one gift that does not.",bad:["People who take the kingdom are cowards.","Whatever a god tells you not to ask must be the best."]}
-    }
-  },
-  trolley: {
-    title:"The Lever", mr:"ट्रॉली प्रॉब्लेम",
-    text:"A runaway trolley will kill five people. You can pull a lever to send it down a side track, where it will kill one person.",
-    options:[{id:"pull",label:"Pull the lever",tags:["util"]},{id:"leave",label:"Do not pull",tags:["duty"]}],
-    assumptions:[
-      {t:"That you know for certain the five will die and the one will die. In life, outcomes are rarely so sure."},
-      {t:"That the one person on the side track has no say in this."},
-      {t:"That pulling and not pulling are the only two acts. You could also shout, or try something and fail.",
-       unlock:{id:"shout",label:"Shout a warning and accept you may fail",tags:["reframe"]}}
-    ],
-    split:{pull:63,leave:29,shout:8},
-    steel:{
-      pull:{good:"Five lives are five lives. If you can save four more people at the same cost, standing still is also a choice.",bad:["Not pulling is just laziness.","Math is always right about people."]},
-      leave:{good:"Pulling makes you the cause of one death. Many traditions hold that doing harm and allowing harm are not the same.",bad:["People who pull the lever like playing god.","The one on the side track was probably more important."]}
-    }
-  },
-  // Adaptive pair: which one you get depends on your trolley answer.
-  trolleyKin: {
-    title:"The Lever, Again", mr:"तो तुमचा सख्खा असेल तर?",
-    text:"Same trolley, same five. But now the one person on the side track is your own brother or sister.",
-    options:[{id:"pull",label:"Pull the lever",tags:["util"]},{id:"leave",label:"Do not pull",tags:["loyal"]}],
-    assumptions:[
-      {t:"That the rule you used a moment ago should hold when it costs you something."},
-      {t:"That strangers count the same as kin. Almost every human culture says they don't, and almost every ethics says they should."},
-      {t:"That the five are just a number. Each of them is someone's sibling too.",
-       unlock:{id:"swap",label:"Ask what your sibling would want you to do",tags:["reframe","we"]}}
-    ],
-    split:{pull:31,leave:61,swap:8},
-    steel:{
-      pull:{good:"If five strangers outweighed one stranger, they outweigh one sibling. Love does not change the arithmetic of the dead.",bad:["Anyone who saves family first is selfish.","Siblings are replaceable."]},
-      leave:{good:"Special duties to family are part of what makes us human. A world where no one protects their own is not a better world.",bad:["Strangers don't matter.","The five should have stayed off the track."]}
-    }
-  },
-  trolleyKin2: {
-    title:"The Lever, Again", mr:"तो तुमचा सख्खा असेल तर?",
-    text:"Same trolley. This time one of the five is your own brother or sister. The one on the side track is a stranger.",
-    options:[{id:"pull",label:"Pull the lever now",tags:["util","loyal"]},{id:"leave",label:"Still do not pull",tags:["duty"]}],
-    assumptions:[
-      {t:"That the rule you used a moment ago should hold when it costs you something."},
-      {t:"That the stranger on the side track matters less now than before. Nothing about the stranger changed."},
-      {t:"That this is about the trolley. It may be about whether your principle was a principle at all.",
-       unlock:{id:"admit",label:"Admit your first answer was not a rule, and say so",tags:["reframe"]}}
-    ],
-    split:{pull:72,leave:22,admit:6},
-    steel:{
-      pull:{good:"Your love for your sibling is real, and saving five including them is the same act many would choose anyway.",bad:["Anyone who changes their answer is a hypocrite.","Family always comes first, no matter what."]},
-      leave:{good:"If not causing a death was the rule, it has to hold even when it hurts. That is what makes it a rule.",bad:["Holding firm is just stubbornness.","The stranger deserves to live more."]}
-    }
-  },
-  theseus: {
-    title:"The Ship and the Avatar", mr:"थिसियसचं जहाज",
-    text:"Every night this game patches your avatar. By now every line of its code has been replaced. Is it still the avatar you began with?",
-    options:[{id:"same",label:"Yes, it is the same avatar",tags:["continuity"]},{id:"new",label:"No, it is a new one",tags:["change"]}],
-    assumptions:[
-      {t:"That identity lives in the parts. It might live in the pattern, or in the story told about it."},
-      {t:"That there is a single fact of the matter, and the question has one answer."},
-      {t:"That this is about the avatar. Most of the cells in your body have also been replaced.",
-       unlock:{id:"both",label:"It is the same in some senses and not in others",tags:["reframe"]}}
-    ],
-    split:{same:44,new:39,both:17},
-    steel:{
-      same:{good:"What makes a thing itself is its continuous history and role, not the matter it happens to be made of today.",bad:["Saying it is new is just being difficult.","Names never change, so things never change."]},
-      new:{good:"If none of the original remains, calling it the same is a convenient story, not a fact.",bad:["People who say 'same' are sentimental.","Old things are always better."]}
-    }
-  },
-  dog: {
-    title:"The Dog at the Gate", mr:"युधिष्ठिराचा कुत्रा",
-    text:"After a long journey, you reach heaven's gate. Your family has fallen on the way. Only a stray dog followed you to the end. Indra says you may enter, but the dog may not.",
-    options:[{id:"enter",label:"Enter heaven",tags:["world"]},{id:"refuse",label:"Refuse to enter without the dog",tags:["loyal","we"]}],
-    assumptions:[
-      {t:"That heaven is worth having on these terms."},
-      {t:"That the dog is just a dog. In the Mahabharata, it was Dharma in disguise. But you don't know that here."},
-      {t:"That Indra's rule cannot be questioned.",
-       unlock:{id:"ask",label:"Ask Indra why the dog is not allowed",tags:["reframe"]}}
-    ],
-    split:{enter:27,refuse:64,ask:9},
-    steel:{
-      enter:{good:"You walked the whole way for this. The dog will be cared for or not either way, and refusing heaven helps no one.",bad:["Anyone who enters is heartless.","Animals don't feel anything."]},
-      refuse:{good:"Abandoning the one who stayed loyal to you would make you unworthy of the place you are entering.",bad:["People who enter were never good.","Dogs are better than people."]}
-    }
-  },
-  halftruth: {
-    title:"Man or Elephant", mr:"नरो वा कुंजरो वा",
-    text:"A war will end sooner, saving many lives, if you tell your old teacher 'Ashwatthama is dead'. An elephant named Ashwatthama has died. His son of the same name is alive. You are known for never lying.",
-    options:[{id:"say",label:"Say it, and mutter 'man or elephant' under your breath",tags:["util"]},{id:"refuse",label:"Refuse to say it",tags:["duty"]}],
-    assumptions:[
-      {t:"That a statement that is technically true cannot be a lie."},
-      {t:"That ending the war sooner really saves more lives."},
-      {t:"That your honesty belongs to you alone. Others trust it, and that trust is also at stake.",
-       unlock:{id:"loud",label:"Say the whole sentence aloud and let him decide",tags:["reframe"]}}
-    ],
-    split:{say:46,refuse:43,loud:11},
-    steel:{
-      say:{good:"Every day of war costs lives. A deception that ends it may be the lesser wrong.",bad:["Truth is overrated.","Teachers are always the enemy in the end."]},
-      refuse:{good:"Your word is trusted because you never bend it. Break it once and you lose what made it worth anything.",bad:["People who lie in wars are evil.","Rules matter more than lives."]}
-    }
-  },
-  fifthhead: {
-    title:"The Fifth Head", mr:"पाचवं मुख",
-    text:"On a mountain, a giant golden head proclaims to the universe: 'I alone am god.' Since then the stars have been going dark. You can reach it.",
-    options:[{id:"cut",label:"Cut off the head, and carry the sin of it",tags:["util"]},{id:"leave",label:"Leave it. It is only a statue",tags:["duty"]}],
-    assumptions:[
-      {t:"That destroying the claimant destroys the claim. Kalabhairava cut off Brahma's fifth head, and still had to wander to Kashi."},
-      {t:"That someone has to be in charge of the truth, and the only question is who."},
-      {t:"That the head is the problem. The problem may be the message it sends.",
-       unlock:{id:"message",label:"Change its message: \"We do not know who or what is divine, but we reject anyone's monopoly on truth.\"",tags:["reframe","we"]}}
-    ],
-    split:{cut:38,leave:21,message:41},
-    steel:{
-      cut:{good:"Some claims do real harm while they stand. Removing the source, and paying for it, can be the honest thing to do.",bad:["Breaking things is always fun.","Anyone who worships it deserves to lose it."]},
-      leave:{good:"Smashing what others worship makes you the next one claiming to know the truth for everyone.",bad:["Statues can't do anything, so nothing matters.","People who want it gone just hate tradition."]}
-    }
-  },
-  rank: {
-    title:"Your Final Rank", mr:"शेवटची पायरी",
-    text:"You have climbed the ladder. The game offers to tell you your final rank: Seeker, Sage, or God.",
-    options:[{id:"show",label:"Show me my rank",tags:["self"]},{id:"decline",label:"I don't want a rank",tags:["we"]}],
-    assumptions:[
-      {t:"That a game can measure humility. Its meters are just a story the designer told."},
-      {t:"That the designer of this game knows better than you what counts."},
-      {t:"That 'God' is a rank anyone can reach. That is the fifth head, again, wearing this game's clothes.",
-       unlock:{id:"split",label:"Ask the others how they would rank me, and don't pick one",tags:["reframe","we"]}}
-    ],
-    split:{show:57,decline:31,split:12},
-    steel:{
-      show:{good:"Feedback, even crude feedback, helps you see yourself. Refusing it can be its own kind of pride.",bad:["Anyone who declines is pretending to be humble.","Scores never lie."]},
-      decline:{good:"A rank turns an open question back into a ladder with a god at the top, which is the very thing the game is about.",bad:["People who want a rank are vain.","Numbers are always meaningless."]}
-    }
-  }
-};
-
-const RUNGS = [
-  {name:"Doors", mr:"दारं", ids:["shreyas","monty","nachiketa"]},
-  {name:"Bodies", mr:"देह", ids:["trolley","ADAPT_TROLLEY","theseus"]},
-  {name:"Gods", mr:"देव", ids:["dog","halftruth","fifthhead"]},
-];
-const GATE = [2,5,8];   // Doubt (assumptions examined) needed to climb past each rung
+// Dilemma content and rung pools live in dilemmas.js.
 
 const AVATARS = {
   util:["The Counter","गणक"], duty:["The Keeper of Rules","नियमपाल"], loyal:["The Loyal","निष्ठावान"],
@@ -344,11 +157,30 @@ const HANDLES = ["mayli_07","yuan.k","aruni","zara-h","sam_r","node-412","gaia-3
                  "bot:ajax","bot:nachi","om.p","anon-88","jiya","theo.s","priya_m","quietdoor"];
 
 // ---------- STATE ----------
-const S = { rung:0, step:0, doubt:0, tol:0, ego:0, tags:{}, history:[], undoubted:[], replay:null, seenA:{}, publicName:null };
+const S = { plan:buildPlan(), rung:0, step:0, doubt:0, tol:0, ego:0, tags:{}, history:[], undoubted:[], replay:null, seenA:{}, publicName:null };
 let cur = null; // per-dilemma working state
 
-// Maximum Doubt and Tolerance in one normal run: 10 dilemmas x 3 assumptions, 10 dilemmas x 2.
-const DMAX = 30, TMAX = 20, EGOMAX = 12;
+// Draw this run's ladder: PER_RUNG dilemmas from each rung's pool, chains kept together, "always" last.
+function buildPlan(){
+  return RUNGS.map(r=>{
+    const out = [];
+    for(const id of shuffle(r.pool)){
+      const size = CHAINS[id] ? 2 : 1;
+      if(out.length + size > PER_RUNG) continue;
+      out.push(id); if(CHAINS[id]) out.push(CHAINS[id]);
+    }
+    if(r.always) out.push(r.always);
+    return out;
+  });
+}
+
+// Maximum Doubt and Tolerance in this run: every planned dilemma (plus the final one) x 3 assumptions, x 2 steelman.
+const NPLAY = S.plan.reduce((n,r)=>n+r.length,0) + 1;
+const DMAX = 3*NPLAY, TMAX = 2*NPLAY, EGOMAX = 12;
+// Doubt needed to climb past each rung: about one exposed assumption per dilemma so far.
+const GATE = S.plan.map((r,i)=>S.plan.slice(0,i+1).reduce((n,x)=>n+x.length,0));
+// The avatar is revealed "now and then" (मधूनमधून): after these rungs (0-based).
+const REVEAL_AFTER = [1,3];
 // Fraction of the sky relit. Full only if the whole ladder is climbed with every doubt and steelman.
 function progress(){
   const p = 0.5*Math.min(1,S.doubt/DMAX) + 0.5*Math.min(1,S.tol/TMAX) - 0.03*S.ego;
@@ -412,7 +244,7 @@ function start(){
 }
 
 function pickId(){
-  let id = RUNGS[S.rung].ids[S.step];
+  let id = S.plan[S.rung][S.step];
   if(id==="ADAPT_TROLLEY"){
     const t = S.history.find(h=>h.id==="trolley");
     id = (t && t.choice==="pull") ? "trolleyKin" : "trolleyKin2";
@@ -421,7 +253,7 @@ function pickId(){
 }
 
 function nextDilemma(){
-  if(S.rung>=RUNGS.length) return showDilemma("rank", true);
+  if(S.rung>=RUNGS.length) return showDilemma(FINAL, true);
   showDilemma(pickId(), false);
 }
 
@@ -526,7 +358,7 @@ function afterDilemma(){
   if(cur.final) return ending();
   if(cur.isReplay){ return gate(); }
   S.step++;
-  if(S.step >= RUNGS[S.rung].ids.length) return avatarReveal();
+  if(S.step >= S.plan[S.rung].length) return REVEAL_AFTER.includes(S.rung) ? avatarReveal() : gate();
   nextDilemma();
 }
 
@@ -570,7 +402,7 @@ function gate(){
     S.rung++; S.step=0;
     return nextDilemma();
   }
-  const id = S.undoubted.shift() || RUNGS[S.rung].ids.filter(x=>x!=="ADAPT_TROLLEY")[0];
+  const id = S.undoubted.shift() || S.plan[S.rung].filter(x=>DILEMMAS[x])[0];
   V.innerHTML = `<div class="card">
     <h2>The next rung will not hold you.</h2><div class="mr">गृहीतकांवरच शंका</div>
     <p>To climb, you need <b>${need}</b> doubt. You have <b>${S.doubt}</b>. ${esc(pick(SAY.gate))}</p>
@@ -607,7 +439,35 @@ function ending(){
   meters();
 }
 
-start();
+// ---------- BETA SECRET WORD ----------
+// A casual gate for beta testers, not security: the page source is readable by anyone who loads it.
+// Set the word with:  python3 tools/set_secret.py <word>
+const SECRET_HASH = "1c557f3d";
+function wordHash(w){
+  // FNV-1a 32-bit over "godsplit:" + the normalised word. Enough for a shared secret word.
+  let h = 0x811c9dc5; const str = "godsplit:" + w.trim().toLowerCase();
+  for(const ch of str){ h ^= ch.codePointAt(0); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h.toString(16).padStart(8,"0");
+}
+function store(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } }
+function lockScreen(){
+  document.body.classList.add("locked");
+  V.innerHTML = `<div class="card lock">
+    <h2>गुहेचं दार</h2><div class="mr">The cave behind the Faraday screen</div>
+    <p>God Split is in beta. Say the secret word to enter.</p>
+    <form onsubmit="tryWord(event)">
+      <input id="word" type="password" autocomplete="off" placeholder="secret word" aria-label="Secret word">
+      <div class="opts"><button class="primary" type="submit">Enter</button></div>
+    </form>
+    <div id="lockfb"></div></div>`;
+}
+function tryWord(e){
+  e.preventDefault();
+  if(wordHash($("word").value) === SECRET_HASH){ store("gs_word", SECRET_HASH); unlock(); }
+  else $("lockfb").innerHTML = `<div class="fb no">${esc(pick(["That is not the word.","The screen stays shut.","Not that one. Doubt your first guess."]))}</div>`;
+}
+function unlock(){ document.body.classList.remove("locked"); start(); }
+if(store("gs_word") === SECRET_HASH) unlock(); else lockScreen();
 </script>
 </body>
 </html>

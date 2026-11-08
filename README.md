@@ -18,8 +18,10 @@ Open `prototype/index.html` in any modern browser. It is one file with no instal
 
     open prototype/index.html        # macOS
 
-If GitHub Pages is enabled for this repository, it is also playable at
-https://ashishmahabal.github.io/GodSplit/prototype/
+Online (GitHub Pages): https://ashishmahabal.github.io/GodSplit/
+The top-level `index.html` only redirects to `prototype/`.
+
+During beta the game asks for a shared **secret word**. Ask the author for it. To change it: `python3 tools/set_secret.py <word>` (only a hash is stored in the page).
 
 ## How it plays
 
@@ -41,7 +43,7 @@ The three meters follow the Auditor's conditions in the story:
 
 ## Status
 
-Prototype **M0**: 10 dilemmas over 3 rungs, one adaptive branch, and other players' choices simulated.
+Prototype **M1**: 24 dilemmas in 5 rungs (Doors, Bodies, Words, Gods, Mirrors). Each run draws 2 per rung, so ladders differ between plays. One adaptive branch. Other players' choices are simulated.
 English first, with Marathi titles and lines from the story. Aimed at adult players.
 See [DESIGN.md](DESIGN.md) for the full plan and milestones.
 
@@ -49,12 +51,15 @@ See [DESIGN.md](DESIGN.md) for the full plan and milestones.
 
 | Path | What |
 |---|---|
-| `prototype/index.html` | The playable prototype |
+| `index.html` | Redirect for GitHub Pages: sends visitors to `prototype/` |
+| `prototype/index.html` | The playable prototype (game engine and page) |
+| `prototype/dilemmas.js` | All dilemma content and the rung pools |
 | `DESIGN.md` | Requirements taken from the story, the core loop, what a full build needs, milestones, licence options |
+| `DILEMMAS.md` | Proposed new dilemmas, for review before they are built |
 | `NOTES.md` | Running log of decisions and known limitations |
 | `COMMANDS.md` | Commands to play and test |
 | `PROMPTS.md` | Prompts used while building this with Claude Code |
-| `tools/` | Headless test: syntax check and scripted playthroughs (`./tools/test.sh`, needs Node and Python 3) |
+| `tools/` | `test.sh`: syntax check, content check, scripted playthroughs (needs Node and Python 3). `set_secret.py`: set the beta secret word |
 | `source/` | Text of the story page, for reference |
 
 ## Contributing
@@ -62,7 +67,7 @@ See [DESIGN.md](DESIGN.md) for the full plan and milestones.
 The most useful contributions are **dilemmas**. The story's own sources (the Upanishads, the Mahabharata,
 the Fifth Head of Brahma) are the start, not the limit: other traditions, philosophy and decision theory are welcome.
 A dilemma needs two options, three hidden assumptions (one of which opens a reframing option),
-and for each option one honest argument and two caricatures. See the `DILEMMAS` object in `prototype/index.html` for the format.
+and for each option one honest argument and two caricatures. See [DILEMMAS.md](DILEMMAS.md) for proposals and `prototype/dilemmas.js` for the code format. `./tools/test.sh` checks that a new dilemma is complete.
 
 ## Licence
 

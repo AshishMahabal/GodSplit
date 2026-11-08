@@ -3,8 +3,13 @@
 ## Play the prototype
     open prototype/index.html
 
-## Test (syntax check plus scripted playthroughs: doubter, middle, decoy, lazy)
+## Set the beta secret word
+    python3 tools/set_secret.py "<word>"
+Case and surrounding spaces are ignored. Marathi words work.
+
+## Test (syntax check, content check of dilemmas.js, scripted playthroughs: doubter, middle, decoy, lazy, and reachability)
     ./tools/test.sh
+    GS_WORD="<word>" ./tools/test.sh     # also checks that the right word opens the gate
 Expected: doubter, middle and decoy reach the Auditor ending (only doubter gets "audit complete"). lazy stays stuck at the first gate (on purpose). `maxLitBeforeFinal` must stay below 120.
 
 ## Screenshot the prototype headless (transitions must be turned off, or bars render empty)
