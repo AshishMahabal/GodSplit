@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Syntax-check the game, validate the dilemma content, and run scripted playthroughs.
 # Set GS_WORD="<secret word>" to also check that the right word opens the gate.
 cd "$(dirname "$0")"

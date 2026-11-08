@@ -96,7 +96,7 @@ Writer/curator of dilemmas (the author), a game designer, one web developer, a s
 - **Audience:** adults.
 - **Frame:** use the story's words and world (Auditor, stars, Avashesh, the Fifth Head, वयंकार), but don't stop there. Content can come from any tradition.
 - **Avatar reveal:** public, shown to everyone. In the prototype other players are simulated. A real version needs the backend from M3.
-- **Licence:** open. Options below.
+- **Licence:** AGPL-3.0-or-later for code, CC BY-SA 4.0 for content (chosen 2026-11-08). Story text in `source/` stays all rights reserved.
 
 ## 7. Licence options
 

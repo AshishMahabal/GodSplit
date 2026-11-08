@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Headless playthrough of prototype/index.html with a stubbed DOM.
 // Usage: node sim.js <doubter|middle|lazy|decoy>
 const fs=require('fs'), path=require('path');

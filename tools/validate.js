@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Content checks for prototype/dilemmas.js, plus ladder reachability.
 // Run via test.sh (expects g.js = dilemmas.js + page script).
 const fs=require('fs'), path=require('path');

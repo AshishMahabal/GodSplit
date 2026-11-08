@@ -36,3 +36,10 @@
 
 **User:**
 > I have made GodSplit temporarily public. How can I take people directly to the game when they go to the github io pages?
+
+## Session 6 (2026-11-08)
+
+**User:**
+> we should add a license before I announce it to beta testers. Also, are there any files we should gitignore?
+
+**Choice (asked):** AGPL-3.0 + CC BY-SA 4.0.

@@ -1,3 +1,5 @@
+// God Split dilemma content. Copyright (C) 2026 Ashish Mahabal.
+// SPDX-License-Identifier: CC-BY-SA-4.0
 // ---------- CONTENT ----------
 // Each dilemma: options carry tags (used for avatar reveal and adaptation).
 // assumptions: hidden premises; one may unlock a reframing option.

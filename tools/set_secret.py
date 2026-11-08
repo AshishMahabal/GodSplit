@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Set the beta secret word in prototype/index.html.
 Usage: python3 tools/set_secret.py <word>
 Stores only a hash (FNV-1a 32-bit, matching wordHash() in the page). Case and surrounding spaces are ignored."""

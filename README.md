@@ -71,4 +71,12 @@ and for each option one honest argument and two caricatures. See [DILEMMAS.md](D
 
 ## Licence
 
-Not chosen yet. The options are in [DESIGN.md](DESIGN.md#7-licence-options). The story text is © its author.
+Copyright © 2026 Ashish Mahabal.
+
+| What | Licence |
+|---|---|
+| Code: `index.html`, `prototype/index.html`, `tools/` | [GNU AGPL-3.0 or later](LICENSE) |
+| Content: the dilemmas in `prototype/dilemmas.js`, and the documents (`*.md`) | [CC BY-SA 4.0](LICENSE-CONTENT) |
+| The story text in `source/` | Not licensed. © the story's author, all rights reserved. Quoted lines used inside the game fall under the game's content licence. |
+
+In short: you may play, copy, change and share God Split. If you share a changed version, including running it as a website, you must share your changes under the same terms and credit the original.

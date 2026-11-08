@@ -92,3 +92,8 @@ English first, adults, story words included but not the limit, reveal shown to e
 - Repo made public (temporarily) by the author, with GitHub Pages.
 - Added top-level `index.html` that redirects to `prototype/` (meta refresh, JS redirect, and a plain link). Relative path, so it works under `/GodSplit/`. Checked with a local server: root, `prototype/` and `prototype/dilemmas.js` all serve, and the root lands on the secret word screen.
 - At the time, sessions 2 to 4 were not yet committed. `prototype/dilemmas.js` must be committed together with `prototype/index.html`, or the online game breaks.
+
+## 2026-11-08: Session 6
+- Licence chosen by the author: AGPL-3.0-or-later (code) + CC BY-SA 4.0 (content). Official texts downloaded into `LICENSE` (gnu.org) and `LICENSE-CONTENT` (creativecommons.org legalcode.txt). SPDX tags added to the top of each code/content file. README has a licence table. `source/` is explicitly not licensed.
+- Copyright line uses the GitHub account name. The story's pen name is not linked to it anywhere in the repo.
+- Added `.gitignore`: macOS files, editor folders, Claude Code local settings, `tools/g.js` (test scratch), node/python caches, `.env*`.
