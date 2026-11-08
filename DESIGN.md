@@ -54,6 +54,16 @@ Other lines that set the game's purpose:
 - Reward design that does not reward a "correct" moral answer. Only reward process: doubt, calibration, steelmanning, listening.
 - Anti-gaming: players who learn to click every assumption and always say "unsure" should not win. Ideas: assumptions cost time or tokens, calibration scored on dilemmas that do have answers (Monty Hall), steelman distractors that change each run.
 
+### Party mode: everyone on their own device (idea, not built)
+Kept apart from the current game. A separate page and mode, sharing only `dilemmas.js`, and later the scoring rules.
+
+- **What it fixes.** In pass-and-play, everyone waits while one person reads and answers. With a phone each, all answer at once, answers are truly private, and there is no handing round.
+- **Two forms.** (a) Rounds: a host starts a room with a short code, everyone sees the same dilemma, answers on their own phone, and the split appears on every phone at once. (b) Parallel climbs: each person climbs their own ladder and the room meets at each rung gate to compare. (a) suits "talk about it" better, so build it first. (b) can share most of the same parts later.
+- **Why it is a good first use of a server.** It needs a small relay and nothing kept: no accounts, and a room disappears when the game ends. It gives real splits among real people without the moderation and privacy work of a public sky or daily dilemma. So it fits after the testers' reports and before Stage 4, and teaches what Stage 4 needs.
+- **What it changes in play.** A soft timer, or "waiting for 2 more", because the slowest player now holds up the room. Steelmen can be typed by each player and voted on. Each player keeps their own meters and constellation, and the sky is shared.
+- **What is hard.** Phones sleeping and players dropping out or joining late. It should carry on without them, and let them back in. It also won't work from a plain file, or offline.
+- **Choices to make then.** Hosting (a managed realtime service is the least work). Whether a shared big screen is optional (suggested: yes, phones alone must be enough).
+
 ### Adaptive engine ("evolves")
 - Player model from tags on choices (utilitarian, loyalty, duty, later-reward, etc.).
 - Selector that picks the dilemma that most strains the current model (if you pull the lever, the one on the track becomes your sibling).

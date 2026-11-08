@@ -17,5 +17,6 @@ node sim.js group
 node sim.js earlier
 node sim.js variants
 node sim.js adapt
+node sim.js look
 node sim.js resume
 rm -f g.js

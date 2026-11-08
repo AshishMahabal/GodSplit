@@ -178,11 +178,31 @@ Author chose A, B and C, with a curious tone. "Should not affect the meters much
 - Author found "Go back to a dilemma answered without looking under it" ambiguous. Now: "Go back to one you answered too quickly, and this time look at what it assumes."
 - Read the rest of the game's text for the same problem. The author approved all 20 proposed rewordings, and they are applied: dangling phrases ("Playing together, the sky is shared"), "looked" and "looking under" with no clear object, "pass on" (also means die), the note's "toward your own" (now "your own people"), the ego lines that slotted in "leaning" badly, and four assumptions in Boxes, One Grain, Sleeping Beauty and Beacon. The review copies were updated to match.
 
+## 2026-11-08: Session 15 (attractiveness plan, nothing built)
+Plan given to the author, waiting for their choices and the testers' reports. Diagnosis: the meters take over half a phone screen before the dilemma, the sky is only a faint background, every dilemma repeats the same 8 taps, and nothing carries over between runs. Principle: reward discovery, never an answer, since no answer is right. Four stages:
+1. Stage: slim phone HUD, the sky as the main visual, staged key moments (third way appearing, split, reveal, Fifth Head), a look for each rung, the Auditor as a doughnut character, optional sound.
+2. Pacing: a faster start, varied dilemma formats, a countdown on the trolley, a shorter run.
+3. Reasons to return (no backend): a record of third ways, names and dilemmas found, the Auditor remembering earlier runs, a personal sky made from each run.
+4. Together (needs the backend of item 6): a daily dilemma with real splits, a share card, one sky shared by all players, group steelmen in players' own words with a room vote.
+Avoid: leaderboards, guilt-based streaks, confetti for answers, timers everywhere.
+Suggested extra tester questions: where did you feel like stopping, and would you play again unprompted?
+
+## 2026-11-08: Session 16 (look and feel, first three items)
+Author chose the minimal starfield style and the first three items.
+- Slim phone bar: at 520px and under, the meters fold into a sticky bar (stars, Doubt against the next rung, Tolerance, Ego), and tapping it opens the full meters. A number that changes pops. Desktop is unchanged. The first screen of a dilemma now starts near the top.
+- Third way: when the unlocking assumption is revealed, the new option opens with a gold glow and a dashed border, a line appears ("There was another door all along", three wordings), the page scrolls it into view, and the dark stars stir. The animation plays once, and the mark stays until commit.
+- Sky: dark stars are a little more visible. The sky no longer follows the meters live. It catches up in an interlude of about 2 seconds after each dilemma: the card fades, new stars light one by one with a soft flare, and "+7, stars lit, 43 of 120" shows. A tap skips it. There is no interlude if no stars were gained, or under the system's reduced-motion setting, which also turns off the other animations. Each next dilemma now starts at the top of the page, which also fixes staying scrolled down on phones.
+- Your skies: each finished run saves a constellation per player in localStorage (`gs_skies`, newest 60 kept, not cleared by a new run). It climbs from bottom to top. Sideways position comes from a hash of dilemma and answer, so the same choices draw the same shape. Size = assumptions examined. Gold = third way taken. Faint branch = first answer let go. It is drawn on the ending, and the start screen offers "Your skies (N)". Only shapes and summaries are stored, no answers in words.
+- Also fixed "1 doubts" in the path list and feedback link.
+- Tests: new `sim.js look` covers these. Also played a whole run in real headless Chrome with real timers: no script errors, no sideways overflow. Looked at phone-width screenshots of each screen, including 320px. Headless Chrome freezes CSS animations, so those were checked at fixed frames only. The motion itself has not been seen by anyone.
+- Party mode (own devices, in one room) written up in DESIGN.md as a separate idea, not built.
+
 ## Where things stand (end of 2026-11-08)
 - Done: plan items 1 (scoring), 2 (beta polish), 3 (pass-and-play), 4 (variants and more dilemmas), 5 (adaptation). All tests pass (`tools/test.sh`). Nothing committed by Claude, the author commits.
 - The three `dilemmas-review*` files went in with the author's push (commit bec1497), so they are tracked now, despite what sessions 11 and 12 say above. They are snapshots of `prototype/dilemmas.js`, which remains the source.
 - Paused here at the author's request. Item 5 and the trolley's 1 in 4 are uncommitted, and the live site won't have them until the author pushes. Do that before sending testers the link.
 - Questions for testers: did "what changed?" feel curious or nagging, and fit their answers? Did the second reveal's name feel earned or random? Did they click through every assumption, or did some change their answer? Was 12 dilemmas the right length? In a group: was passing the phone awkward, and did they actually argue? The feedback link needs a GitHub account, so testers without one should report directly.
 - Open choice for the author: keep the three `dilemmas-review*` files in the repo or remove them. They make the hidden assumptions and arguments easy to find while the repo is public.
+- Look and feel items 1 to 3 are done (session 16), and uncommitted. The author should see the motion on a real phone before pushing.
 - Next: waiting for reports back from 2 or 3 people playing. The author also still has `dilemmas-review-batch2.md` to read, especially the source lines, which were written from memory, ideally before testers see them. Decide after the reports: reveal budget, run length (2 or 3 per rung), group extras, whether the note and the name shift fire too often. Item 6 (backend, share card, Marathi UI) only after that, and when asked.
 - Before announcing: try a round of pass-and-play with 2 or 3 real people on a phone.

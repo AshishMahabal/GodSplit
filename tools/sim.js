@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Headless playthrough of prototype/index.html with a stubbed DOM.
-// Usage: node sim.js <doubter|changer|middle|lazy|decoy|group|reach|reveal|resume|earlier|variants|adapt|adaptstats>
+// Usage: node sim.js <doubter|changer|middle|lazy|decoy|group|reach|reveal|resume|earlier|variants|adapt|adaptstats|look>
 const fs=require('fs'), path=require('path');
-const el=()=>({style:{},textContent:'',innerHTML:'',setAttribute(){},getContext:()=>new Proxy({},{get:()=>()=>{}}),classList:{add(){}}});
+const el=()=>({style:{},textContent:'',innerHTML:'',setAttribute(){},getContext:()=>new Proxy({},{get:()=>()=>({addColorStop(){}})}),classList:{add(){},remove(){}}});
 const els={};
 const cls=new Set();
-global.document={body:{classList:{add:c=>cls.add(c),remove:c=>cls.delete(c)}},getElementById:id=>els[id]||(els[id]=el()),querySelectorAll:()=>[]};
+global.document={body:{classList:{add:c=>cls.add(c),remove:c=>cls.delete(c),toggle:c=>cls.has(c)?(cls.delete(c),false):(cls.add(c),true)}},getElementById:id=>els[id]||(els[id]=el()),querySelectorAll:()=>[],querySelector:()=>null};
 global.innerWidth=800;global.innerHeight=600;global.devicePixelRatio=1;
 const LS={};global.localStorage={getItem:k=>k in LS?LS[k]:null,setItem:(k,v)=>{LS[k]=String(v)},removeItem:k=>{delete LS[k]}};
-global.addEventListener=()=>{};global.requestAnimationFrame=()=>{};
+global.addEventListener=()=>{};global.requestAnimationFrame=()=>{};global.scrollTo=()=>{};
+// The sky interlude waits on a timer. Here it runs at once, so a playthrough stays synchronous.
+global.setTimeout=f=>f();
 eval(fs.readFileSync(path.join(__dirname,'g.js'),'utf8')+`
-;global.G={AXES,RUNGS,sideOf,leanOf,targetAxis,retarget,whatChangedNote,shiftLine,EARLIER,showDilemma,VARIANTS,dilemmaOf,save,AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,loadSave,SAVE_KEY,DMAX,LS,wordHash,S,get cur(){return cur},newPlayer,turn,renderDilemma,roomSplit,steelTurn,progress,nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
+;global.G={get shownN(){return shownN},cls,skyBeat,makeSky,saveSkies,loadSkies,skySVG,skiesView,start,ending,SKIES_KEY,SKIES_MAX,toggleHud,AXES,RUNGS,sideOf,leanOf,targetAxis,retarget,whatChangedNote,shiftLine,EARLIER,showDilemma,VARIANTS,dilemmaOf,save,AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,loadSave,SAVE_KEY,DMAX,LS,wordHash,S,get cur(){return cur},newPlayer,turn,renderDilemma,roomSplit,steelTurn,progress,nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
 function unlockGate(){
   // Page must open on the lock screen; a wrong word keeps it shut; the right hash opens it.
   if(!cls.has('locked')||!G.V.innerHTML.includes('secret word')) throw Error('gate not shown');
@@ -277,6 +279,75 @@ if(process.argv[2]==='reveal'){
   let notes=0; for(let i=0;i<100;i++) notes+=run(people.random).notes;
   if(notes<100) bad.push('notes are rare: '+notes+' in 100 runs');
   console.log(bad.length?'ADAPT FAIL: '+[...new Set(bad)].join('; '):`adapt ok: note, targeted draw and name shift behave, ${notes} notes in 100 runs`);
+} else if(process.argv[2]==='look'){
+  // The third way's moment, the sky interlude, and the constellations kept after a run.
+  const S=G.S, bad=[], door=h=>/class="[^"]*\bdoor\b/.test(h), third=h=>/class="[^"]*\bthird\b/.test(h);
+  // Constellations: one per finished run, climbing, the same choices giving the same shape.
+  const n0=G.loadSkies().length;
+  const r1=play('doubter');
+  if(!r1.end) bad.push('run did not finish');
+  const all=G.loadSkies();
+  if(all.length!==n0+1) bad.push('run saved '+(all.length-n0)+' skies');
+  const k=all[all.length-1];
+  if(k.pts.length!==12) bad.push('constellation has '+k.pts.length+' stars');
+  if(k.pts.some((p,i)=>i&&p[1]>=k.pts[i-1][1])) bad.push('constellation does not climb');
+  if(k.pts.some(p=>p[0]<10||p[0]>90||p[1]<8||p[1]>122)) bad.push('star outside the frame');
+  if(JSON.stringify(G.makeSky(S.players[0]).pts)!==JSON.stringify(k.pts)) bad.push('same answers, different shape');
+  // Third way: the door animates once, when it opens, and stays marked afterwards. The next player starts clean.
+  S.mode='group'; S.players=['Asha','Bo'].map(G.newPlayer); S.turn=0;
+  G.showDilemma('dog',false); G.renderDilemma(); G.choose(G.cur.opts[0].id);
+  let opened=0;
+  for(let i=0;i<3;i++){
+    const had=G.cur.doorId; G.reveal();
+    if(G.cur.doorId&&!had){ opened++; if(!door(G.V.innerHTML)) bad.push('no door when the third way opened'); }
+    else if(door(G.V.innerHTML)) bad.push('door animated without opening');
+  }
+  if(opened!==1) bad.push('third way opened '+opened+' times');
+  G.conf('unsure');
+  if(door(G.V.innerHTML)) bad.push('door animated again on the next render');
+  if(!third(G.V.innerHTML)||!G.V.innerHTML.includes('doorline')) bad.push('third way lost its mark');
+  G.commit(); G.turn(); G.renderDilemma();
+  if(third(G.V.innerHTML)||G.V.innerHTML.includes('doorline')) bad.push('next player sees the door before finding it');
+  // Interlude: the sky catches up with the meters only at this moment, and always moves on.
+  S.mode='solo'; S.players=[G.newPlayer('You')]; S.turn=0;
+  let moved=0, P=S.players[0], from=G.shownN;
+  P.doubt=20; P.tol=10;
+  const target=Math.round(G.progress()*120);
+  if(G.shownN!==from) bad.push('sky moved before the interlude');
+  G.skyBeat(()=>moved++);
+  if(moved!==1) bad.push('interlude did not move on');
+  if(G.shownN!==target) bad.push('sky did not catch up: '+G.shownN+' of '+target);
+  if(G.cls.has('gaze')) bad.push('interlude stayed on screen');
+  G.skyBeat(()=>moved++);
+  if(moved!==2) bad.push('no move on when no stars were lit');
+  // Slim bar: tapping folds and unfolds the meters.
+  G.toggleHud(); if(!G.cls.has('hudopen')) bad.push('meters did not open'); G.toggleHud(); if(G.cls.has('hudopen')) bad.push('meters did not close');
+  // Marks: third way gold, a let-go first answer as a branch, size from what was questioned.
+  S.players=[G.newPlayer('You')];
+  S.players[0].history.push({id:'dog',choice:'ask',first:'enter',examined:3},{id:'monty',choice:'stay',first:'switch',examined:1},{id:'pascal',choice:'nobet',first:null,examined:0});
+  const m=G.makeSky(S.players[0]).pts;
+  if(m[0][3]!==1||m[1][3]!==0) bad.push('third way not marked');
+  if(m[0][4]===undefined||m[1][4]===undefined||m[2][4]!==undefined) bad.push('branches wrong');
+  if(m[0][2]!==3||m[2][2]!==0) bad.push('size does not follow what was questioned');
+  // The page: start offers the skies, the view lists them, and bad or overfull storage is handled.
+  G.start();
+  if(!G.V.innerHTML.includes('Your skies ('+G.loadSkies().length+')')) bad.push('start screen does not offer the skies');
+  G.skiesView();
+  if((G.V.innerHTML.match(/<figure>/g)||[]).length!==G.loadSkies().length) bad.push('skies view misses some');
+  G.saveSkies(Array.from({length:70},(_,i)=>({...k,lit:i})));
+  const kept=G.loadSkies();
+  if(kept.length!==G.SKIES_MAX||kept[kept.length-1].lit!==69) bad.push('cap should keep the newest');
+  G.LS[G.SKIES_KEY]='not json'; if(G.loadSkies().length!==0) bad.push('bad storage not handled');
+  G.LS[G.SKIES_KEY]='{"a":1}'; if(G.loadSkies().length!==0) bad.push('wrong storage not handled');
+  // Group: one constellation per player, shown at the end, and a new run doesn't clear them.
+  delete G.LS[G.SKIES_KEY];
+  S.mode='group'; S.players=['Asha','Bo'].map(G.newPlayer);
+  S.players.forEach(p=>p.history.push({id:'dog',choice:'enter',first:null,examined:1},{id:G.FINAL,choice:'show',first:null,examined:1}));
+  G.ending();
+  const g=G.loadSkies();
+  if(g.length!==2||g[0].who!=='Asha'||g[1].who!=='Bo') bad.push('group skies wrong');
+  if((G.V.innerHTML.match(/<svg/g)||[]).length!==2) bad.push('group ending should show 2 constellations');
+  console.log(bad.length?'LOOK FAIL: '+bad.join('; '):'look ok: third way, sky interlude, slim bar and constellations behave');
 } else if(process.argv[2]==='resume'){
   // Play part of a run, then check the saved state loads back the same, and that a bad save is dropped.
   play('doubter',5);

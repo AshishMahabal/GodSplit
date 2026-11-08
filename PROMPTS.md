@@ -121,3 +121,17 @@
 
 **User:**
 > apply all of them
+
+## Session 15 (2026-11-08)
+
+**User:**
+> we are waiting for the testers, but meanwhile can you step back and see how we could make the game attractive? Graphics? animations? Only plan, no implementation yet. Think of best gaming practices etc. What keeps people in
+
+**User:**
+> minimal starfield style, go ahead with your first three. One option could also be multiple people in the room on their own devices - like a party game, but each doing their own. Let us not mix this with what we have, but think about it and see where/how it fits
+
+**User:**
+> locally, without pushing, can I just open prototypes/index.html?
+
+**User:**
+> how do I go to phone view in dev tools?
