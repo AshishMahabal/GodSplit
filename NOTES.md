@@ -32,3 +32,36 @@
 
 ### Open questions for the author
 See DESIGN.md section 6 (language, audience, story frame vs standalone, licence, how public the reveal is).
+
+## 2026-11-07: Session 2
+
+### Author's answers
+English first, adults, story words included but not the limit, reveal shown to everyone, licence options wanted. Recorded in DESIGN.md section 6.
+
+### Author's playtest findings and what changed
+- **All 120 stars lit and the game went on.** The star formula saturated after about 7 dilemmas. Now stars = progress toward the Auditor's verdict: 50% from Doubt (max 30), 50% from Tolerance (max 20), minus 3% per Ego point. Full sky only possible at the end. The ending verdict uses the same number (>= 75%), so the sky and the verdict can't disagree. Decision: the ladder is the structure, the sky is a running verdict, so the game does not end early.
+- **"Ego cleared" shown when ego was already 0.** Reveal now says "Ego cleared (N → 0)" only when N > 0, and has separate wording for zero.
+- **Mechanism too predictable.**
+  - Feedback lines are now drawn from pools of three.
+  - Option order and assumption order are shuffled every time, so the unlocking assumption is not always last.
+  - Steelman now has a decoy: the good argument for a *different* side. Before this, the honest argument was always the long reasoned one and could be spotted by length.
+  - Doubt counts once per assumption, so replaying a dilemma no longer farms it.
+- **Meters.** Horizontal 6px bars replaced with vertical columns with the number on top. Doubt and Tolerance use categorical blue and aqua (checked with the dataviz palette validator on the panel colour: pass). Ego is a status meter: grey "low" (0-2), amber "rising" (3-5), red "high" (6+), captioned "keep this low".
+- **Stars lit** is now a ring with the percentage and the count in the middle. A ring rather than a pie because the Auditor in the story appears as a doughnut (डोनट).
+- **Public reveal.** The reveal says everyone can see the name, shows six simulated other players' reveals, and the header shows "seen as <name>" from then on.
+
+### Tests
+`tools/test.sh` now runs four playthroughs: doubter (120/120 at the end, 108 max before the final round), middle (80, verdict "audit continues"), decoy (60), lazy (stuck at gate one).
+
+### Still open
+- Exposing every assumption every time still maxes Doubt. Possible fix: a budget of doubts per rung, or doubts that cost time.
+- Strawmen are fixed text. A larger pool per option, or generated variants, would help.
+- `source/naikeshwar_story_raw.txt` is in the public repo with the site's navigation, reader comments and "All rights reserved" footer. Author to decide whether to keep it.
+- GitHub Pages not yet confirmed.
+
+## 2026-11-07: Session 2, follow-up
+- Author commits and pushes periodically. Don't commit unless asked.
+- Story text in `source/` stays: ऐसी अक्षरे is openly readable anyway.
+- GitHub Pages: turn on later, after polishing.
+- Open: should beta testing need a shared password (secret word)? The repo is public, so a password on the page only keeps out casual visitors. See the options in the session 2 discussion: client-side secret word, or real access control via a host such as Cloudflare Pages with Access.
+- Content is still the original 10 dilemmas. Session 2 added only feedback wording pools and decoy arguments (reusing existing text).

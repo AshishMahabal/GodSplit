@@ -39,8 +39,8 @@ Other lines that set the game's purpose:
 3. **Choose** an option and a **confidence** (certain / leaning / unsure).
    - Ego rises with confidence, but only if you examined no assumption. Certainty after examination is allowed. (This matters for Monty Hall, which has a real answer under its stated rules.)
 4. **The Split**: see how other players divided (simulated in the prototype).
-5. **Steelman**: pick the strongest argument for an option you did *not* choose, out of one honest argument and two strawmen. Right pick raises Tolerance.
-6. **Stars** relight as the meters improve.
+5. **Steelman**: pick the strongest argument for an option you did *not* choose, out of three: the honest argument, a strawman (picked from two), and a decoy that is a good argument for a different side. Right pick raises Tolerance, a strawman lowers it, the decoy does neither.
+6. **Stars** relight as the meters improve. The sky is scaled so it can only fill completely at the very end, with every assumption examined and every steelman right. The same fraction decides the Auditor's verdict (75% or more = audit complete).
 7. At the end of each rung: **Avatar reveal** and a **ladder gate** (needs enough Doubt, otherwise you replay a dilemma you answered without doubting).
 8. Final round questions the game's own score. Then the Auditor speaks.
 
@@ -83,16 +83,41 @@ Writer/curator of dilemmas (the author), a game designer, one web developer, a s
 
 ## 5. Milestones
 
-1. **M0, done here**: single-file playable prototype, 10 dilemmas, 3 rungs, reveal, gate, steelman, stars, Auditor ending.
+1. **M0, done**: single-file playable prototype, 10 dilemmas, 3 rungs, public reveal (simulated), gate, steelman with decoys, star ring, Auditor ending.
 2. **M1**: content moved to data files, Marathi UI, 25 dilemmas, playtest with 10 people.
 3. **M2**: real split counts via a small backend, shareable result card.
 4. **M3**: group rooms with steelman chat, moderation.
 5. **M4**: adaptive generation with review queue, AI-player API.
 
-## 6. Open questions for the author
+## 6. Decisions (author, 2026-11-07)
 
-- Primary language of the game: Marathi first, or English first with Marathi?
-- Audience for v1: adults who read the story, or children too?
-- Should the story's world (Auditor, stars, Avashesh, Trump head) be the frame, or should the game stand alone?
-- Licence choice.
-- How far should the "avatar reveal" go: private label only, or shown to other players?
+- **Language:** English first. Marathi titles and story lines stay.
+- **Audience:** adults.
+- **Frame:** use the story's words and world (Auditor, stars, Avashesh, the Fifth Head, वयंकार), but don't stop there. Content can come from any tradition.
+- **Avatar reveal:** public, shown to everyone. In the prototype other players are simulated. A real version needs the backend from M3.
+- **Licence:** open. Options below.
+
+## 7. Licence options
+
+Code and content are best licensed separately.
+
+**Code**
+
+| Licence | What it means | Fits if |
+|---|---|---|
+| MIT | Anyone can use, change, sell, close. Only keep the notice. | You want the widest spread, the "most viral game in history" path. |
+| Apache-2.0 | Like MIT, plus an explicit patent grant. | Companies may build on it. |
+| GPL-3.0 | Changed versions that are distributed must stay open. | You want forks to stay open. |
+| AGPL-3.0 | Like GPL, and also covers forks run as a web service. | Once there is a server (M2+), and you don't want a closed hosted fork. |
+
+**Content** (dilemmas, text, art)
+
+| Licence | What it means |
+|---|---|
+| CC BY 4.0 | Reuse anything with credit. |
+| CC BY-SA 4.0 | Reuse with credit, and adaptations must use the same licence. |
+| CC BY-NC-SA 4.0 | As above, but no commercial use. Not "open source" in the strict sense. |
+
+**Suggestion:** AGPL-3.0 for code and CC BY-SA 4.0 for content. Both keep every fork open, which matches the story's "no one holds a monopoly on truth". If the main goal is reach, MIT plus CC BY 4.0 is the low-friction alternative.
+
+The story itself stays © the author. Quoting short lines in the game is fine as the author's own choice. The full story text in `source/` should be checked against ऐसी अक्षरे's terms before it stays in a public repo.
