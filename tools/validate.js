@@ -3,11 +3,24 @@
 // Run via test.sh (expects g.js = dilemmas.js + page script).
 const fs=require('fs'), path=require('path');
 const src=fs.readFileSync(path.join(__dirname,'..','prototype','dilemmas.js'),'utf8');
-eval(src+';global.C={DILEMMAS,RUNGS,CHAINS,PER_RUNG,FINAL};');
-const {DILEMMAS,RUNGS,CHAINS,PER_RUNG,FINAL}=C;
+eval(src+';global.C={DILEMMAS,VARIANTS,RUNGS,CHAINS,PER_RUNG,FINAL};');
+const {DILEMMAS,VARIANTS,RUNGS,CHAINS,PER_RUNG,FINAL}=C;
 const errs=[];
 const AVATAR_TAGS=["util","duty","loyal","now","later","world","seeker","reframe","we","stay","switch","continuity","change","self"];
-for(const [id,d] of Object.entries(DILEMMAS)){
+// Every dilemma, and every variant as the game would play it (merged over its dilemma).
+const versions=Object.entries(DILEMMAS);
+let nvar=0;
+for(const [id,vs] of Object.entries(VARIANTS)){
+  if(!DILEMMAS[id]) { errs.push(`variant of missing dilemma ${id}`); continue; }
+  vs.forEach((v,i)=>{
+    nvar++;
+    const base=DILEMMAS[id], m={...base,...v}, name=`${id} variant ${i+1}`;
+    for(const k of ["title","text","src"]) if(!v[k]||v[k]===base[k]) errs.push(`${name}: needs its own ${k}`);
+    if(m.options.map(o=>o.id).join()!==base.options.map(o=>o.id).join()) errs.push(`${name}: must keep the option ids`);
+    versions.push([name,m]);
+  });
+}
+for(const [id,d] of versions){
   const e=m=>errs.push(`${id}: ${m}`);
   for(const k of ["title","mr","text","src"]) if(!d[k]) e(`missing ${k}`);
   if(d.options?.length!==2) e("needs exactly 2 options");
@@ -36,5 +49,5 @@ for(const id of pooled) if(!DILEMMAS[id]) errs.push(`pool references missing ${i
 const sequels=["trolleyKin","trolleyKin2"];
 for(const id of Object.keys(DILEMMAS)) if(!pooled.has(id)&&id!==FINAL&&!sequels.includes(id)) errs.push(`${id} is not in any rung pool`);
 for(const r of RUNGS) if(r.pool.length<PER_RUNG+1) errs.push(`rung ${r.name} pool too small to vary`);
-console.log(errs.length?`CONTENT ERRORS:\n  ${errs.join("\n  ")}`:`content ok: ${Object.keys(DILEMMAS).length} dilemmas, ${RUNGS.length} rungs`);
+console.log(errs.length?`CONTENT ERRORS:\n  ${errs.join("\n  ")}`:`content ok: ${Object.keys(DILEMMAS).length} dilemmas, ${nvar} variants, ${RUNGS.length} rungs`);
 process.exitCode=errs.length?1:0;

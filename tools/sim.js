@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Headless playthrough of prototype/index.html with a stubbed DOM.
-// Usage: node sim.js <doubter|changer|middle|lazy|decoy|group|reach|reveal|resume>
+// Usage: node sim.js <doubter|changer|middle|lazy|decoy|group|reach|reveal|resume|earlier|variants>
 const fs=require('fs'), path=require('path');
 const el=()=>({style:{},textContent:'',innerHTML:'',setAttribute(){},getContext:()=>new Proxy({},{get:()=>()=>{}}),classList:{add(){}}});
 const els={};
@@ -10,7 +10,7 @@ global.innerWidth=800;global.innerHeight=600;global.devicePixelRatio=1;
 const LS={};global.localStorage={getItem:k=>k in LS?LS[k]:null,setItem:(k,v)=>{LS[k]=String(v)},removeItem:k=>{delete LS[k]}};
 global.addEventListener=()=>{};global.requestAnimationFrame=()=>{};
 eval(fs.readFileSync(path.join(__dirname,'g.js'),'utf8')+`
-;global.G={AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,loadSave,SAVE_KEY,DMAX,LS,wordHash,S,get cur(){return cur},newPlayer,turn,renderDilemma,roomSplit,steelTurn,progress,nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
+;global.G={EARLIER,showDilemma,VARIANTS,dilemmaOf,save,AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,loadSave,SAVE_KEY,DMAX,LS,wordHash,S,get cur(){return cur},newPlayer,turn,renderDilemma,roomSplit,steelTurn,progress,nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
 function unlockGate(){
   // Page must open on the lock screen; a wrong word keeps it shut; the right hash opens it.
   if(!cls.has('locked')||!G.V.innerHTML.includes('secret word')) throw Error('gate not shown');
@@ -122,6 +122,60 @@ if(process.argv[2]==='reveal'){
   const ok=end && replays>0 && reveals===2 && steelOk===steelAll && S.players.every(p=>p.history.length>=12);
   console.log((ok?'group ok: ':'GROUP FAIL: ')+JSON.stringify({rounds,replays,reveals,steel:`${steelOk}/${steelAll}`,stars:G.lit(),
     players:S.players.map(p=>`${p.name} d${p.doubt} t${p.tol} e${p.ego} h${p.history.length}`)}));
+} else if(process.argv[2]==='earlier'){
+  // Each player in a group is reminded of their own trolley answer, in both sequels, even in the minority.
+  const S=G.S, D=G.DILEMMAS, t=D.trolley;
+  const ids=[...t.options.map(o=>o.id),...t.assumptions.filter(a=>a.unlock).map(a=>a.unlock.id)];
+  const missing=ids.filter(id=>!G.EARLIER[id]);
+  if(missing.length) throw Error('no wording for trolley answer: '+missing);
+  S.mode='group'; S.players=ids.map(G.newPlayer); S.turn=0;
+  S.players.forEach((p,i)=>p.history.push({id:'trolley',choice:ids[i]}));
+  let bad=0;
+  for(const seq of ['trolleyKin','trolleyKin2']){
+    G.showDilemma(seq,false);
+    ids.forEach((id,i)=>{
+      G.cur.k=i; G.turn(); G.renderDilemma();
+      const h=G.V.innerHTML;
+      if(!h.includes('A minute ago '+G.EARLIER[id]+'.')||h.includes('{earlier}')) bad++;
+    });
+    if(D[seq].options.some(o=>/still|now/i.test(o.label))) bad++;
+  }
+  // After replaying the trolley with another answer, the latest answer is the one recalled.
+  S.players[0].history.push({id:'trolley',choice:'leave'});
+  G.showDilemma('trolleyKin',false); G.cur.k=0; G.turn(); G.renderDilemma();
+  if(!G.V.innerHTML.includes('A minute ago '+G.EARLIER.leave+'.')) bad++;
+  console.log(bad?'EARLIER FAIL: '+bad:'earlier ok: every trolley answer is recalled correctly in both sequels');
+} else if(process.argv[2]==='variants'){
+  // Variants are drawn, stay fixed for the run and through a save, and every version of every dilemma plays through.
+  const S=G.S; let bad=[];
+  for(const id of Object.keys(G.VARIANTS)){
+    const seen=new Set();
+    for(let i=0;i<200;i++){
+      delete S.variants[id]; const t=G.dilemmaOf(id).title; seen.add(t);
+      if(G.dilemmaOf(id).title!==t) bad.push(id+' changed within a run');
+    }
+    if(seen.size!==G.VARIANTS[id].length+1) bad.push(id+' drew '+seen.size+' versions');
+  }
+  G.save('next');
+  const back=G.loadSave();
+  if(!back||JSON.stringify(back.variants)!==JSON.stringify(S.variants)) bad.push('variants lost in the save');
+  let played=0;
+  for(const id of Object.keys(G.DILEMMAS)){
+    for(let n=0;n<=(G.VARIANTS[id]||[]).length;n++){
+      if(G.VARIANTS[id]) S.variants[id]=n;
+      G.showDilemma(id,false);
+      const c=G.cur;
+      if(!G.V.innerHTML.includes(c.d.title)) bad.push(id+'/'+n+' title not shown');
+      G.choose(c.opts[0].id); G.reveal(); G.reveal(); G.reveal();
+      if(c.opts.length!==3) bad.push(id+'/'+n+' third way not unlocked');
+      G.choose(c.opts[2].id); G.conf('leaning'); G.commit();
+      if(!G.V.innerHTML.includes('The Split')) bad.push(id+'/'+n+' no split');
+      const i=c.args.findIndex(a=>a.kind==='ok');
+      if(i<0||c.args.some(a=>!a.t)) bad.push(id+'/'+n+' bad steelman');
+      G.steel(i); played++;
+    }
+  }
+  console.log(bad.length?'VARIANTS FAIL: '+bad.join('; '):`variants ok: ${played} versions played through, every version gets drawn, kept through a save`);
 } else if(process.argv[2]==='resume'){
   // Play part of a run, then check the saved state loads back the same, and that a bad save is dropped.
   play('doubter',5);

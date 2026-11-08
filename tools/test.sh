@@ -14,5 +14,7 @@ for m in doubter changer middle decoy lazy; do node sim.js $m; done
 node sim.js reach
 node sim.js reveal
 node sim.js group
+node sim.js earlier
+node sim.js variants
 node sim.js resume
 rm -f g.js

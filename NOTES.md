@@ -140,3 +140,26 @@ Item 2, polish:
 - Footer: "In solo play, other players are simulated for now."
 - Test: `sim.js group` plays 4 players with different styles (one skips looking at first, so the gate holds that player back alone). Checks hand-offs, split counts, steelman targets, reveal and that the run ends.
 - Not done: a timer or a way to stop players peeking, a discussion prompt per dilemma, real-group votes on whose steelman was fairest. Steelmen are still multiple choice.
+
+## 2026-11-08: Session 11
+- Reviewed the notes and listed next steps for the author.
+- Trolley sequel wording fixed for group play. The room still shares one sequel, chosen by majority, but "A minute ago ..." now comes from each player's own latest trolley answer (`{earlier}` in the text, `EARLIER` in dilemmas.js), including the third way (shout). Sequel option labels are now neutral ("Pull the lever", "Do not pull"), since "Still do not pull" was false for anyone who pulled and is also shown on the room's split. New test: `sim.js earlier`.
+- Left as is: in the minority, the assumption "the rule you used a moment ago should hold when it costs you something" can miss, since that player's rule may cost them nothing in this sequel. It still reads sensibly. Each player getting their own sequel would break the room's shared split.
+- `dilemmas-review.html` (project root, not tracked, snapshot): readable page of the 13 batch 1 dilemmas for the author's review.
+- `dilemmas-review.md` (project root, not tracked): the same content as Markdown, for the author to edit, since Markdown is easier to update. `DILEMMAS.md` only has the short proposals, without the session 8 texts or the arguments. The game reads `prototype/dilemmas.js`, so edits to the review copy are carried over by hand (by Claude, on request).
+
+## 2026-11-08: Session 12 (plan item 4: variants and more dilemmas)
+- Author read the 13 from batch 1: fine, no changes.
+- Built the other 22 proposals from DILEMMAS.md (all 35 now built), in the rungs proposed there. 46 dilemmas in all. Pools: Doors 6, Bodies 8, Words 9, Gods 10, Mirrors 9. Still 2 per rung, 12 a run.
+- Texts, arguments and simulated splits are new, and the sources were written from memory, not checked against references. The Marathi titles are the ones the author corrected in DILEMMAS.md. No new Marathi was written.
+- Variants: `VARIANTS` in dilemmas.js holds a second version of 9 dilemmas, with a changed setup that changes the question (monty, boxes, dog, theseus, kashi, tyrant, bhishma, euthyphro, halftruth). A variant replaces only the fields it lists and keeps the option ids. Each has its own title, so the path and the feedback link show which version was played.
+- `dilemmaOf(id)` draws the version the first time a dilemma comes up (evenly among original and variants) and keeps it in `S.variants`, so replays and everyone at the table get the same one, and it survives a save. Save version is now 3, so saves from before this are dropped.
+- Tests: `validate.js` checks every variant merged over its dilemma, and that it has its own title, text and source and keeps the option ids. New `sim.js variants` plays all 55 versions through reveal, third way, split and steelman, and checks a version stays fixed within a run and through a save.
+- `dilemmas-review-batch2.md` (project root, not tracked): the 22 and the 9 variants, for the author to read.
+- Side effect, author's call: the trolley chain is now in 1 run in 8 (it was 1 in 4), measured over 100,000 draws. It is the only adaptive branch, and the story's own question. It could be weighted up, or plan item 5 may make this matter less.
+- Not done: a larger pool of caricatures per side. With 46 dilemmas, repeats are much rarer, so this can wait for playtest evidence.
+
+## Where things stand (end of 2026-11-08)
+- Done: plan items 1 (scoring), 2 (beta polish), 3 (pass-and-play), 4 (variants and more dilemmas). All tests pass (`tools/test.sh`). Nothing committed by Claude, the author commits.
+- Next: the author reads the new content in `dilemmas-review-batch2.md`, and decides on the trolley's frequency. Then, when asked: 5 adaptation by tags, 6 backend, share card, Marathi UI.
+- Before announcing: try a round of pass-and-play with 2 or 3 real people on a phone.

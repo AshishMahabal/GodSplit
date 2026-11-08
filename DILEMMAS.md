@@ -55,7 +55,7 @@ Your town can keep a ruler everyone knows to be cruel but predictable, or open t
 - Assumptions: that being predictable makes something safe. That not knowing is worse than knowing something bad. **Unlocks:** *that the town must be ruled by one of the two.* → "Refuse both, and ask who decided there were only two."
 - Tags: stay, change · Rung: Gods
 
-### A3. The God Who Tweeted Himself Into Existence · ट्विटोत्भूत देव
+### A3. The God Who Tweeted Himself Into Existence · ट्विटोत्भूत देव ✅ built
 *From the story: "ट्विट करून स्वतःला अस्तित्वात आणणारा हा एकमेव देव आहे."*
 A being announces it is divine. A billion people believe it. Their belief changes how they live, for better and for worse.
 - **A:** It is divine, in every way that matters.
@@ -63,7 +63,7 @@ A being announces it is divine. A billion people believe it. Their belief change
 - Assumptions: that "divine" names a property something can simply have. That numbers count for something here. **Unlocks:** *that the question has to be answered at all.* → "Ask what would change, for anyone, if the answer were yes."
 - Tags: continuity, change · Rung: Gods
 
-### A4. Earned, Not Appointed · दैवत्व कमवावं लागतं
+### A4. Earned, Not Appointed · दैवत्व कमवावं लागतं ✅ built
 *From the story: "दैवत्व कमवावं लागतं, ते नियुक्त केलं जाऊ शकत नाही."*
 A saint you have revered all your life is shown, beyond doubt, to have done something cruel.
 - **A:** Keep revering them. One act doesn't erase a life.
@@ -71,7 +71,7 @@ A saint you have revered all your life is shown, beyond doubt, to have done some
 - Assumptions: that reverence has to be all or nothing. That the person was what made the teaching true. **Unlocks:** → "Keep the teaching, put down the person."
 - Tags: loyal, change · Rung: Gods
 
-### A5. The Beacon · क्वांटम बिकन
+### A5. The Beacon · क्वांटम बिकन ✅ built
 *From the story: the quantum beacon that sends humanity's message across the universe.*
 You can send one message, in humanity's name, to whatever is out there. It will be heard for a million years.
 - **A:** Send our greatest achievements.
@@ -79,7 +79,7 @@ You can send one message, in humanity's name, to whatever is out there. It will 
 - Assumptions: that anyone is listening. That one message can speak for eight billion people. **Unlocks:** → "Send a question instead."
 - Tags: world, we · Rung: Mirrors
 
-### A6. The Simulated Star · कोणाच्या तरी बनावटीतून
+### A6. The Simulated Star · कोणाच्या तरी बनावटीतून ✅ built
 *From the story: the first star relights "not in Earth's sky, but in someone's simulation."*
 A star relights, but only inside a simulation. Everyone who lives in that simulation sees it shine.
 - **A:** It counts. It is a real star for them.
@@ -99,7 +99,7 @@ A man gambles away his kingdom, his brothers, and himself. Then he stakes his wi
 - Assumptions: that the game's rules are the highest law in the hall. That a person can be owned and staked at all. **Unlocks:** *that the elders' silence is neutral.* → "Ask the elders why they are silent."
 - Tags: duty, reframe · Rung: Words
 
-### B2. Ekalavya's Thumb · एकलव्याचा अंगठा
+### B2. Ekalavya's Thumb · एकलव्याचा अंगठा ✅ built
 *Mahabharata.* A teacher who refused to teach you now asks for your right thumb as his fee, to keep a promise he made to another student.
 - **A:** Give it. A student pays the teacher.
 - **B:** Refuse. He never taught you.
@@ -113,7 +113,7 @@ A man gambles away his kingdom, his brothers, and himself. Then he stakes his wi
 - Assumptions: that the hawk's hunger and the dove's fear weigh the same. That you are the one who must pay. **Unlocks:** → "Ask the hawk whether this is a test."
 - Tags: util, we · Rung: Bodies
 
-### B4. Karna's Armour · कर्णाची कवचकुंडलं
+### B4. Karna's Armour · कर्णाची कवचकुंडलं ✅ built
 *Mahabharata.* You have vowed never to refuse anyone who asks you for a gift. A stranger asks for the armour you were born with, the one thing keeping you alive in tomorrow's battle. You suspect who he really is.
 - **A:** Give it. A vow with exceptions is not a vow.
 - **B:** Refuse. A vow that kills you was never wise.
@@ -127,14 +127,14 @@ A man gambles away his kingdom, his brothers, and himself. Then he stakes his wi
 - Assumptions: that the oath means today what it meant when you made it. That keeping a word and doing right can't conflict. **Unlocks:** → "Keep the oath, and say aloud what it is making you allow."
 - Tags: duty, change · Rung: Words · Fits Doubt: definitions change over time.
 
-### B6. Arjuna's Bow · अर्जुनविषाद
+### B6. Arjuna's Bow · अर्जुनविषाद ✅ built
 *Bhagavad Gita, chapter 1.* Your cause is just. The army against you is full of your teachers, cousins and friends.
 - **A:** Fight. The cause is just.
 - **B:** Lay down the bow.
 - Assumptions: that a just cause justifies the means. That refusing to act is not itself an act. **Unlocks:** → "Ask whether 'just' was decided before or after you knew who stood on the other side."
 - Tags: duty, loyal · Rung: Bodies
 
-### B7. The Mustard Seed · किसा गोतमी
+### B7. The Mustard Seed · किसा गोतमी ✅ built
 *Buddhist.* A mother carries her dead child and begs you to bring it back. You can tell her the truth, or send her to find a mustard seed from a house where no one has died, knowing she will find none.
 - **A:** Tell her plainly.
 - **B:** Send her for the seed.
@@ -156,21 +156,21 @@ Six people touch an elephant in the dark. One says rope, one says wall, one says
 - Assumptions: that there is an elephant, and that someone can see all of it. That the one with the lamp would be believed. **Unlocks:** → "Ask all six to describe it together."
 - Tags: reframe, we · Rung: Gods
 
-### B10. Tukaram's Manuscripts · इंद्रायणीतील गाथा
+### B10. Tukaram's Manuscripts · इंद्रायणीतील गाथा ✅ built
 *Marathi, Varkari tradition.* The elders rule that you are not entitled to write about the divine, and order your writings thrown into the river. Legend says the river returned them.
 - **A:** Obey. The tradition has its keepers for a reason.
 - **B:** Refuse. No one owns the right to speak of god.
 - Assumptions: that the river returning the books would settle the matter. That the elders speak for the tradition. **Unlocks:** → "Throw them in, and keep singing them from memory."
 - Tags: duty, reframe · Rung: Gods
 
-### B11. Harishchandra at the Cremation Ground · हरिश्चंद्र
+### B11. Harishchandra at the Cremation Ground · हरिश्चंद्र ✅ built
 *Puranic.* You have sworn to collect the cremation fee from everyone, no exceptions. A widow comes with her son's body and nothing to pay. She is your wife. The son was yours.
 - **A:** Ask her for the fee.
 - **B:** Waive it, this once.
 - Assumptions: that a rule which bends for you was ever a rule. That the gods who are testing you are owed this. **Unlocks:** → "Pay the fee yourself, from your own wages."
 - Tags: duty, loyal · Rung: Words
 
-### B12. Savitri's Bargain · सावित्री
+### B12. Savitri's Bargain · सावित्री ✅ built
 *Mahabharata.* Death grants you any boon except your husband's life. You ask for sons with your husband. Death must now return him or break his word.
 - **A:** That was fair. Words bind even Death.
 - **B:** That was a trick. Clever wording is not truth.
@@ -189,7 +189,7 @@ Is something good because the gods command it, or do the gods command it because
 - Assumptions: that the gods agree with each other. That "good" means one thing. **Unlocks:** → "Neither. The question assumes goodness has a single source."
 - Tags: duty, seeker · Rung: Gods
 
-### C2. Solomon's Sword · सॉलोमनचा न्याय
+### C2. Solomon's Sword · सॉलोमनचा न्याय ✅ built
 *Hebrew Bible.* Two women claim one baby. You can order it cut in half, trusting that the real mother will give up her claim to save it.
 - **A:** Run the test.
 - **B:** Don't. Someone may call your bluff.
@@ -203,28 +203,28 @@ Is something good because the gods command it, or do the gods command it because
 - Assumptions: that a prophecy is a prediction. That being wrong and being useful are opposites. **Unlocks:** → "Be glad, and stop needing to be right."
 - Tags: change, reframe · Rung: Mirrors
 
-### C4. Job's Friends · ईयोबचे मित्र
+### C4. Job's Friends · ईयोबचे मित्र ✅ built
 *Hebrew Bible.* A good man loses everything. His friends tell him he must have done something to deserve it. You are one of the friends.
 - **A:** Tell him to search his conscience.
 - **B:** Tell him he did nothing to deserve it.
 - Assumptions: that the world is fair. That you can know why anything happened to him. **Unlocks:** → "Sit with him and say nothing."
 - Tags: duty, we · Rung: Gods
 
-### C5. Zhuangzi's Butterfly · फुलपाखराचं स्वप्न
+### C5. Zhuangzi's Butterfly · फुलपाखराचं स्वप्न ✅ built
 *Daoist.* You dreamed you were a butterfly. Now you can't be sure you aren't a butterfly dreaming of being you.
 - **A:** I am the person. The dream was a dream.
 - **B:** I can't know which.
 - Assumptions: that one of them has to be the real one. That the waking feeling of certainty is evidence. **Unlocks:** → "It doesn't matter which, and that is the interesting part."
 - Tags: continuity, change · Rung: Mirrors
 
-### C6. The Ring of Gyges · अदृश्य अंगठी
+### C6. The Ring of Gyges · अदृश्य अंगठी ✅ built
 *Plato.* A ring makes you invisible whenever you wish. No one would ever know what you did.
 - **A:** Use it, but only for good.
 - **B:** Throw it away.
 - Assumptions: that you would stay the same person while using it. That being watched is why people behave. **Unlocks:** → "Give it to someone you trust, and see what happens to the trust."
 - Tags: seeker, duty · Rung: Mirrors
 
-### C7. One Grain at a Time · वाळूचा ढीग
+### C7. One Grain at a Time · वाळूचा ढीग ✅ built
 *Sorites paradox, Greek.* Taking one grain from a heap leaves a heap. So when does a devout believer become a fanatic? No single act seems to make the difference.
 - **A:** There is a line, even if we can't see it.
 - **B:** There is no line, only a slope.
@@ -249,35 +249,35 @@ Is something good because the gods command it, or do the gods command it because
 - Assumptions: that the prediction is already fixed. That "never wrong so far" means "can't be wrong". **Unlocks:** → "Ask the Auditor how it predicts."
 - Tags: later, now · Rung: Doors · Experts are split on this one, which is the point.
 
-### D3. Sleeping Beauty · झोपलेली राजकन्या
+### D3. Sleeping Beauty · झोपलेली राजकन्या ✅ built
 You are put to sleep. A coin is tossed. Heads: you are woken once. Tails: you are woken twice, with memory wiped in between. You wake up. What is the chance the coin was heads?
 - **A:** 1/2.
 - **B:** 1/3.
 - Assumptions: that "chance" means one thing here. That your waking gives you new information. **Unlocks:** → "It depends what you'll be paid for being right."
 - Tags: stay, switch · Rung: Doors · Philosophers still disagree. Good for showing that certainty can be calibrated without a consensus.
 
-### D4. The Two Envelopes · दोन पाकिटं
+### D4. The Two Envelopes · दोन पाकिटं ✅ built
 One envelope holds twice as much as the other. You open one. It seems you should always switch, since the other could hold double or half. But then, by the same reasoning, you should switch back.
 - **A:** Switch.
 - **B:** Keep it.
 - Assumptions: that reasoning which feels sound can be trusted. That "double or half, equally likely" makes sense here. **Unlocks:** → "Find where the argument goes wrong before choosing."
 - Tags: switch, stay · Rung: Doors
 
-### D5. The City Built on One Child · एका मुलावर उभं शहर
+### D5. The City Built on One Child · एका मुलावर उभं शहर ✅ built
 *After Ursula K. Le Guin's "The Ones Who Walk Away from Omelas" (cite, don't copy).* A city is happy in every way, but its happiness depends on one child kept in misery. Everyone knows.
 - **A:** Stay. One child for a whole city.
 - **B:** Walk away.
 - Assumptions: that walking away helps the child. That the bargain truly can't be changed. **Unlocks:** → "Stay, and try to free the child."
 - Tags: util, duty · Rung: Bodies
 
-### D6. Behind the Veil · अज्ञानाचा पडदा
+### D6. Behind the Veil · अज्ञानाचा पडदा ✅ built
 *John Rawls.* You will design the rules for a world, then be born into it, without knowing who you will be.
 - **A:** Make the worst-off as well off as possible.
 - **B:** Make the average as high as possible.
 - Assumptions: that you would choose like a careful person and not a gambler. That the veil is possible even in imagination. **Unlocks:** → "Ask the people already living there."
 - Tags: we, util · Rung: Bodies
 
-### D7. The Experience Machine · अनुभवयंत्र
+### D7. The Experience Machine · अनुभवयंत्र ✅ built
 *Robert Nozick.* A machine can give you a life of perfect experiences. You will believe it is real.
 - **A:** Plug in.
 - **B:** Stay out.
@@ -298,7 +298,7 @@ A source you trust completely offers you the right answer to every dilemma in th
 - Assumptions: that there are right answers to look up. That a trusted source can't be a fifth head. **Unlocks:** → "Look, then argue with it."
 - Tags: seeker, reframe · Rung: Mirrors · Meta: the game questioning itself.
 
-### D10. The Last Believer · शेवटचा भक्त
+### D10. The Last Believer · शेवटचा भक्त ✅ built
 Everyone you know has stopped believing something you still believe. No one has disproved it. They just moved on.
 - **A:** Keep believing.
 - **B:** Let it go.
@@ -324,21 +324,26 @@ Everyone you know has stopped believing something you still believe. No one has 
 
 Batch 1 (session 4): the ten suggested ones, **B1, B9, C1, D1, A1, A2, B5, D2, C3, D8**, plus **B3 Shibi** and **B8 Angulimala** (Bodies needed more) and **D9 The Answer Sheet** (Mirrors). They are in `prototype/dilemmas.js`, with arguments for each side written there.
 
+Batch 2 (session 12): the other 22, **A3 to A6, B2, B4, B6, B7, B10 to B12, C2, C4 to C7, D3 to D7, D10**, in the rungs proposed above.
+
+Variants (session 12): a second version of nine dilemmas, in `VARIANTS` in `prototype/dilemmas.js`. Each run plays the original or the variant: The Host Who Didn't Know (Monty Hall), The Auditor's Odds (Boxes), The Enemy at the Gate (Dog), The Ship and the Constitution (Theseus), The Settlement (Kashi), The Known Medicine (Tyrant), The Signed Paper (Old Vow), Just Because It Is Law? (Euthyphro), The Doctor's Half-Truth (Man or Elephant).
+
 Current rung pools:
 
 | Rung | Pool (2 drawn per run) |
 |---|---|
-| Doors | Two Doors, Monty Hall, Nachiketa, Auditor's Boxes |
-| Bodies | Trolley (always followed by its adaptive sequel, uses both slots), Shibi, Angulimala, Dog at the Gate |
-| Words | Man or Elephant, Kashi Loophole, Draupadi, The Old Vow |
-| Gods | Known Tyrant, Blind Men and the Elephant, Euthyphro, A Thousand Gods, then always The Fifth Head |
-| Mirrors | Theseus, Jonah, AI Player, Answer Sheet |
+| Doors | Two Doors, Monty Hall, Nachiketa, Auditor's Boxes, Sleeping Beauty, Two Envelopes |
+| Bodies | Trolley (always followed by its adaptive sequel, uses both slots), Shibi, Angulimala, Dog at the Gate, Ekalavya, Arjuna, City on One Child, Behind the Veil |
+| Words | Man or Elephant, Kashi Loophole, Draupadi, The Old Vow, Karna, Mustard Seed, Harishchandra, Savitri, Solomon |
+| Gods | Known Tyrant, Blind Men and the Elephant, Euthyphro, A Thousand Gods, Tweeted God, Earned Not Appointed, Tukaram, Job's Friends, One Grain at a Time, Last Believer, then always The Fifth Head |
+| Mirrors | Theseus, Jonah, AI Player, Answer Sheet, Beacon, Simulated Star, Butterfly, Ring of Gyges, Experience Machine |
 | Last | Your Final Rank |
 
-Not yet built: A3 to A6, B2, B4, B6, B7, B10 to B12, C2, C4 to C7, D3 to D7, D10.
+All 35 proposals are now built.
 
 ## Review notes for the author
 
 - Reviewed by the author on 2026-11-08: all kept, Marathi titles corrected.
 - The arguments (one honest, two caricatures per side) for the built ones are new. Worth a read in `prototype/dilemmas.js`.
 - Sensitivity check needed for B2 (caste), B10 (who may write scripture), C2 to C4 (living faiths), A3 and A2 (read as political).
+- Batch 2 and the variants are in `dilemmas-review-batch2.md` for review.

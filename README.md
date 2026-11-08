@@ -45,7 +45,7 @@ The three meters follow the Auditor's conditions in the story:
 
 ## Status
 
-Prototype **M1**: 24 dilemmas in 5 rungs (Doors, Bodies, Words, Gods, Mirrors). Each run draws 2 per rung, so ladders differ between plays. One adaptive branch. Solo or pass-and-play for 2 to 5 people. In solo play, other players' choices are simulated. A run is saved between dilemmas in the browser, so it can be continued later.
+Prototype **M1**: 46 dilemmas in 5 rungs (Doors, Bodies, Words, Gods, Mirrors), nine of them with a second version. Each run draws 2 per rung, so ladders differ between plays. One adaptive branch. Solo or pass-and-play for 2 to 5 people. In solo play, other players' choices are simulated. A run is saved between dilemmas in the browser, so it can be continued later.
 English first, with Marathi titles and lines from the story. Aimed at adult players.
 See [DESIGN.md](DESIGN.md) for the full plan and milestones.
 
@@ -55,9 +55,9 @@ See [DESIGN.md](DESIGN.md) for the full plan and milestones.
 |---|---|
 | `index.html` | Redirect for GitHub Pages: sends visitors to `prototype/` |
 | `prototype/index.html` | The playable prototype (game engine and page) |
-| `prototype/dilemmas.js` | All dilemma content and the rung pools |
+| `prototype/dilemmas.js` | All dilemma content, variants and the rung pools |
 | `DESIGN.md` | Requirements taken from the story, the core loop, what a full build needs, milestones, licence options |
-| `DILEMMAS.md` | Proposed new dilemmas, for review before they are built |
+| `DILEMMAS.md` | The original short proposals for the dilemmas, and which rung each is in |
 | `NOTES.md` | Running log of decisions and known limitations |
 | `COMMANDS.md` | Commands to play and test |
 | `PROMPTS.md` | Prompts used while building this with Claude Code |

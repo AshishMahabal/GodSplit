@@ -77,3 +77,22 @@
 
 **User:**
 > go ahead with 3
+
+**User:**
+> I will exit and restart. update what you need to
+
+## Session 11 (2026-11-08)
+
+**User:**
+> look at notes etc and remind me of the next steps we can take
+
+**User:**
+> where can I check the 13 dilemmas? yes, fix trolley wording if it needs fixing. Do item 4 after I look at the 13 dilemmas
+
+**User:**
+> don't we have an md file for the 13 dilemmas? md is easier to update
+
+## Session 12 (2026-11-08)
+
+**User:**
+> the dilemmas are fine. I did not make any change. Go ahead with building #4
