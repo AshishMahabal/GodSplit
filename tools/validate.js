@@ -3,8 +3,8 @@
 // Run via test.sh (expects g.js = dilemmas.js + page script).
 const fs=require('fs'), path=require('path');
 const src=fs.readFileSync(path.join(__dirname,'..','prototype','dilemmas.js'),'utf8');
-eval(src+';global.C={DILEMMAS,VARIANTS,RUNGS,CHAINS,PER_RUNG,FINAL};');
-const {DILEMMAS,VARIANTS,RUNGS,CHAINS,PER_RUNG,FINAL}=C;
+eval(src+';global.C={DILEMMAS,VARIANTS,AXES,RUNGS,CHAINS,CHANCE,PER_RUNG,FINAL};');
+const {DILEMMAS,VARIANTS,AXES,RUNGS,CHAINS,CHANCE,PER_RUNG,FINAL}=C;
 const errs=[];
 const AVATAR_TAGS=["util","duty","loyal","now","later","world","seeker","reframe","we","stay","switch","continuity","change","self"];
 // Every dilemma, and every variant as the game would play it (merged over its dilemma).
@@ -43,6 +43,12 @@ for(const [id,d] of versions){
   const txt=JSON.stringify(d);
   if(txt.includes("—")) e("contains an em dash");
 }
+// Axes use known tags, each tag on one axis only, and name both sides.
+const axisTags=AXES.flatMap(ax=>[...ax.a,...ax.b]);
+for(const t of axisTags) if(!AVATAR_TAGS.includes(t)) errs.push(`axis uses unknown tag ${t}`);
+if(new Set(axisTags).size!==axisTags.length) errs.push("a tag appears on more than one axis side");
+for(const ax of AXES) if(ax.words?.length!==2) errs.push(`axis ${ax.a} needs a word for each side`);
+for(const id of Object.keys(CHANCE)) if(!RUNGS.some(r=>r.pool.includes(id))) errs.push(`CHANCE names ${id}, which is in no pool`);
 // Every pooled id exists; every dilemma (except chain sequels picked by the engine, and FINAL) is in some pool.
 const pooled=new Set(RUNGS.flatMap(r=>[...r.pool,...(r.always?[r.always]:[])]));
 for(const id of pooled) if(!DILEMMAS[id]) errs.push(`pool references missing ${id}`);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Headless playthrough of prototype/index.html with a stubbed DOM.
-// Usage: node sim.js <doubter|changer|middle|lazy|decoy|group|reach|reveal|resume|earlier|variants>
+// Usage: node sim.js <doubter|changer|middle|lazy|decoy|group|reach|reveal|resume|earlier|variants|adapt|adaptstats>
 const fs=require('fs'), path=require('path');
 const el=()=>({style:{},textContent:'',innerHTML:'',setAttribute(){},getContext:()=>new Proxy({},{get:()=>()=>{}}),classList:{add(){}}});
 const els={};
@@ -10,7 +10,7 @@ global.innerWidth=800;global.innerHeight=600;global.devicePixelRatio=1;
 const LS={};global.localStorage={getItem:k=>k in LS?LS[k]:null,setItem:(k,v)=>{LS[k]=String(v)},removeItem:k=>{delete LS[k]}};
 global.addEventListener=()=>{};global.requestAnimationFrame=()=>{};
 eval(fs.readFileSync(path.join(__dirname,'g.js'),'utf8')+`
-;global.G={EARLIER,showDilemma,VARIANTS,dilemmaOf,save,AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,loadSave,SAVE_KEY,DMAX,LS,wordHash,S,get cur(){return cur},newPlayer,turn,renderDilemma,roomSplit,steelTurn,progress,nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
+;global.G={AXES,RUNGS,sideOf,leanOf,targetAxis,retarget,whatChangedNote,shiftLine,EARLIER,showDilemma,VARIANTS,dilemmaOf,save,AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,loadSave,SAVE_KEY,DMAX,LS,wordHash,S,get cur(){return cur},newPlayer,turn,renderDilemma,roomSplit,steelTurn,progress,nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
 function unlockGate(){
   // Page must open on the lock screen; a wrong word keeps it shut; the right hash opens it.
   if(!cls.has('locked')||!G.V.innerHTML.includes('secret word')) throw Error('gate not shown');
@@ -176,6 +176,107 @@ if(process.argv[2]==='reveal'){
     }
   }
   console.log(bad.length?'VARIANTS FAIL: '+bad.join('; '):`variants ok: ${played} versions played through, every version gets drawn, kept through a save`);
+} else if(process.argv[2]==='adapt'||process.argv[2]==='adaptstats'){
+  const S=G.S, ASK='class="fb ask"';
+  const fresh=(names=['You'])=>{ S.plan=G.buildPlan(); S.variants={}; S.rung=0; S.step=0; S.turn=0; S.mode=names.length>1?'group':'solo'; S.players=names.map(G.newPlayer); };
+  // Plays one solo run. prefer(option) scores a main option; ties are random. Returns what the player saw.
+  const run=prefer=>{
+    fresh();
+    let n=0, notes=0, shift=null; const planned=[];
+    G.nextDilemma();
+    while(n++<80){
+      const html=G.V.innerHTML;
+      if(html.includes('A message from the Auditor')) break;
+      if(html.includes('Avatar reveal')){ if(S.rung===3) shift=/The name has moved|has shifted since|What changed\?/.test(html); G.reveal2(true); G.gate(); continue; }
+      if(html.includes('will not hold')){ G.replay(html.match(/replay\('(\w+)'\)/)[1]); continue; }
+      if(html.includes('Climb on')){ G.nextDilemma(); continue; }
+      const c=G.cur; planned.push(c.id);
+      const best=[...c.opts].sort((x,y)=>prefer(y)-prefer(x)+(Math.random()-.5)*.01)[0];
+      G.choose(best.id); G.reveal(); G.reveal(); G.reveal(); G.conf('leaning');
+      G.commit();
+      if(G.V.innerHTML.includes(ASK)) notes++;
+      G.steel(c.args.findIndex(a=>a.kind==='ok')); G.afterDilemma();
+    }
+    return {notes,shift,planned};
+  };
+  const has=(o,...t)=>o.tags.some(x=>t.includes(x));
+  const people={ random:o=>0, rules:o=>has(o,'duty')-has(o,'util'), results:o=>has(o,'util')-has(o,'duty'), holder:o=>has(o,'continuity','stay')-has(o,'change','switch') };
+  if(process.argv[2]==='adaptstats'){
+    // Not a pass/fail test: how often each thing fires, for tuning. Shows 2000 runs per kind of player.
+    const touches=(id,ax)=>G.DILEMMAS[id].options.some(o=>G.sideOf(o,ax)!==null);
+    const drawn=id=>G.RUNGS.slice(1).some(r=>r.pool.includes(id));   // rung 1 has no answers to target from
+    const axisOf={rules:0,results:0,holder:1,random:0};
+    for(const [name,p] of Object.entries(people)){
+      let notes=0,zero=0,shifts=0,trolley=0,hits=0,all=0,baseHits=0,baseAll=0; const N=2000, ax=G.AXES[axisOf[name]];
+      for(let i=0;i<N;i++){
+        const r=run(p); notes+=r.notes; if(!r.notes) zero++; if(r.shift) shifts++;
+        if(r.planned.includes('trolley')) trolley++;
+        for(const id of r.planned) if(drawn(id)){ all++; if(touches(id,ax)) hits++; }
+        for(const id of G.buildPlan().flat()) if(drawn(id)){ baseAll++; if(touches(id,ax)) baseHits++; }
+      }
+      console.log(name.padEnd(8),`notes/run ${(notes/N).toFixed(2)}  runs with no note ${(100*zero/N).toFixed(1)}%  name moved at 2nd reveal ${(100*shifts/N).toFixed(1)}%  trolley ${(100*trolley/N).toFixed(1)}%  dilemmas on their axis ${(100*hits/all).toFixed(1)}% (untargeted ${(100*baseHits/baseAll).toFixed(1)}%)`);
+    }
+    process.exit(0);
+  }
+  const bad=[]; const opt=(d,id)=>G.DILEMMAS[d].options.find(o=>o.id===id);
+  const answer=(d,id)=>{ G.showDilemma(d,false); G.choose(id); G.conf('unsure'); };
+  // A: duty, then util, asks. The same side doesn't. Only once per rung. No effect on the meters.
+  fresh(); answer('bhishma','keep'); G.commit();
+  if(G.V.innerHTML.includes(ASK)) bad.push('note with nothing to compare');
+  answer('halftruth','refuse'); G.commit();
+  if(G.V.innerHTML.includes(ASK)) bad.push('note when both answers lean the same way');
+  const P=S.players[0];
+  answer('city','stay');
+  const metersBefore=JSON.stringify([P.doubt,P.tol,P.ego]);
+  const seen=G.whatChangedNote(P,opt('city','stay'));
+  if(!seen.includes('What changed?')||!seen.includes('Both can be true')) bad.push('no note when answers lean opposite ways');
+  if(JSON.stringify([P.doubt,P.tol,P.ego])!==metersBefore) bad.push('the note moved a meter');
+  if(G.whatChangedNote(P,opt('fifthhead','cut'))) bad.push('second note in one rung');
+  S.rung=1;
+  if(!G.whatChangedNote(P,opt('fifthhead','cut'))) bad.push('no note on the next rung');
+  // A third way leans nowhere, unless its tags say so; a replay of the same dilemma doesn't compare with itself.
+  fresh(); answer('bhishma','keep'); G.commit(); answer('bhishma','break'); G.commit();
+  if(G.V.innerHTML.includes(ASK)) bad.push('note compared a dilemma with itself');
+  // The final rank never asks.
+  fresh(); answer('bhishma','keep'); G.commit(); G.showDilemma(G.FINAL,true);
+  if(G.whatChangedNote(S.players[0],{tags:['change']})) bad.push('note on the final rank');
+  // Group: the note is private, shown only to the player it is about, never on the room's split.
+  fresh(['Asha','Bo']);
+  S.players[0].history.push({id:'bhishma',choice:'keep'}); S.players[1].history.push({id:'fifthhead',choice:'cut'});
+  G.showDilemma('city',false); G.renderDilemma(); G.choose('stay'); G.conf('unsure'); G.commit();
+  const privA=G.V.innerHTML;
+  G.turn(); G.renderDilemma(); G.choose('stay'); G.conf('unsure'); G.commit();
+  const privB=G.V.innerHTML;
+  if(!privA.includes(ASK)) bad.push('group: no private note for the player who leaned both ways');
+  if(privB.includes(ASK)) bad.push('group: note shown to the player who did not');
+  G.roomSplit();
+  if(G.V.innerHTML.includes(ASK)) bad.push('group: note leaked to the room');
+  // B: the rung keeps its length, and draws lean toward the target axis.
+  for(let i=0;i<300;i++){
+    fresh(); S.players[0].history.push({id:'bhishma',choice:'keep'});
+    const lengths=S.plan.map(r=>r.length);
+    for(let k=1;k<G.RUNGS.length;k++){ S.rung=k; G.retarget(); }
+    if(JSON.stringify(S.plan.map(r=>r.length))!==JSON.stringify(lengths)) bad.push('retarget changed a rung length');
+    S.plan.forEach((r,k)=>{ if(k && new Set(r).size!==r.length) bad.push('rung drew a dilemma twice'); });
+  }
+  fresh(); if(G.targetAxis()!==null) bad.push('a target axis with no answers yet');
+  // The trolley's chance holds both at the first draw and after targeting, whatever the player leans toward.
+  const N=20000; let drawnFirst=0, retargeted=0;
+  fresh(); S.players[0].history.push({id:'shreyas',choice:'now'},{id:'monty',choice:'stay'}); S.rung=1;
+  for(let i=0;i<N;i++){
+    if(G.buildPlan()[1].includes('trolley')) drawnFirst++;
+    G.retarget(); if(S.plan[1].includes('trolley')) retargeted++;
+    if(S.plan[1].includes('trolley')!==S.plan[1].includes('ADAPT_TROLLEY')) bad.push('trolley without its sequel');
+  }
+  for(const [what,n] of [['first draw',drawnFirst],['after targeting',retargeted]]) if(Math.abs(n/N-.25)>.015) bad.push(`trolley in ${(100*n/N).toFixed(1)}% of runs at ${what}`);
+  // C: the first reveal says nothing; later ones say whether the name moved.
+  if(G.shiftLine(null,'x')) bad.push('shift line at the first reveal');
+  if(G.shiftLine('The Loyal','The Loyal').includes('The Loyal')) bad.push('same-name line names the old name');
+  if(!G.shiftLine('The Loyal','The Counter').length) bad.push('no line when the name moved');
+  // Whole runs still finish, with notes showing up.
+  let notes=0; for(let i=0;i<100;i++) notes+=run(people.random).notes;
+  if(notes<100) bad.push('notes are rare: '+notes+' in 100 runs');
+  console.log(bad.length?'ADAPT FAIL: '+[...new Set(bad)].join('; '):`adapt ok: note, targeted draw and name shift behave, ${notes} notes in 100 runs`);
 } else if(process.argv[2]==='resume'){
   // Play part of a run, then check the saved state loads back the same, and that a bad save is dropped.
   play('doubter',5);

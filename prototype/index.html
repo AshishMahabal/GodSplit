@@ -67,6 +67,7 @@ button.primary{background:var(--accent);color:#1a1606;border-color:var(--accent)
 .fb{padding:10px 12px;border-radius:8px;margin-top:10px;font-size:15px}
 .fb.ok{background:#6cc5a01c;border:1px solid #6cc5a055}
 .fb.no{background:#e07a6b1c;border:1px solid #e07a6b55}
+.fb.ask{background:#ffffff0d;border:1px solid #ffffff2e}
 .center{text-align:center}
 .big{font-size:20px}
 .auditor{font-family:ui-monospace,Menlo,monospace;color:var(--accent);white-space:pre-wrap}
@@ -164,6 +165,18 @@ const SAY = {
   changedAgain:[
     "You changed your answer after looking. The meter has already counted enough changes for this climb.",
     "Changed again. The meter has stopped counting changes. A mind that always flips is as fixed as one that never does."],
+  whatChanged:[
+    "Earlier, at \"{then}\", you chose \"{was}\" and leaned toward {a}. Here you leaned toward {b}. Both can be true. What changed?",
+    "\"{then}\" had you leaning toward {a}: \"{was}\". This one has you leaning toward {b}. Both can be true. What changed?",
+    "You went toward {a} at \"{then}\" (\"{was}\"), and toward {b} here. Both can be true. What changed?"],
+  newName:[
+    "At the last reveal you were {prev}. The name has moved. Did you?",
+    "You were {prev} last time. Something in your choices has shifted since then.",
+    "Last time the network saw {prev}. What changed?"],
+  sameName:[
+    "The same name as last time. Has anything moved underneath it?",
+    "Still this name. Is that steadiness, or habit?",
+    "The name has held since the last reveal. Has it held for the same reasons?"],
   rungLine:[
     "The Auditor is watching the sky, not your answers.",
     "Nobody below you agreed on the last rung either.",
@@ -185,7 +198,7 @@ const HANDLES = ["mayli_07","yuan.k","aruni","zara-h","sam_r","node-412","gaia-3
 // Solo: one player, the others simulated. Group (pass-and-play): 2 to 5 people share one device,
 // each with their own meters. The ladder (plan, rung, step) is shared.
 const SAVE_KEY = "gs_save", SAVE_V = 3;
-function newPlayer(name){ return { name, doubt:0, tol:0, ego:0, tags:{}, history:[], undoubted:[], seenA:{}, seenChange:{}, publicName:null }; }
+function newPlayer(name){ return { name, doubt:0, tol:0, ego:0, tags:{}, history:[], undoubted:[], seenA:{}, seenChange:{}, publicName:null, noted:null, shift:"" }; }
 const S = loadSave() || { v:SAVE_V, mode:"solo", plan:buildPlan(), variants:{}, rung:0, step:0, players:[newPlayer("You")], turn:0, resume:null };
 const me = () => S.players[S.turn];
 // A dilemma in the version this run plays. Drawn the first time it comes up, then kept (and saved), so replays
@@ -210,18 +223,84 @@ function save(where){ S.resume = where; store(SAVE_KEY, JSON.stringify(S)); }
 function clearSave(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
 let cur = null; // the dilemma being played: shared part, plus the private state of whoever's turn it is
 
-// Draw this run's ladder: PER_RUNG dilemmas from each rung's pool, chains kept together, "always" last.
-function buildPlan(){
-  return RUNGS.map(r=>{
-    const out = [];
-    for(const id of shuffle(r.pool)){
-      const size = CHAINS[id] ? 2 : 1;
-      if(out.length + size > PER_RUNG) continue;
-      out.push(id); if(CHAINS[id]) out.push(CHAINS[id]);
-    }
-    if(r.always) out.push(r.always);
-    return out;
+// Draw one rung: PER_RUNG dilemmas from its pool, chains kept together, "always" last. weight makes some likelier.
+function drawRung(r, weight){
+  const fixed = r.pool.filter(id=>id in CHANCE);
+  const order = fixed.filter(id=>Math.random()<CHANCE[id]).concat(
+    r.pool.filter(id=>!(id in CHANCE)).map(id=>[id, Math.random()**(1/(weight?weight(id):1))]).sort((x,y)=>y[1]-x[1]).map(x=>x[0]));
+  const out = [];
+  for(const id of order){
+    const size = CHAINS[id] ? 2 : 1;
+    if(out.length + size > PER_RUNG) continue;
+    out.push(id); if(CHAINS[id]) out.push(CHAINS[id]);
+  }
+  if(r.always) out.push(r.always);
+  return out;
+}
+// This run's ladder. Each rung is drawn again when it is reached (see retarget), keeping its length.
+function buildPlan(){ return RUNGS.map(r=>drawRung(r)); }
+
+// ---------- ADAPTATION ----------
+// Noticing how a player leans. None of this touches the meters.
+// Which side of an axis an option leans to: 0, 1, or null if neither or both.
+function sideOf(o, ax){
+  const a = o.tags.some(t=>ax.a.includes(t)), b = o.tags.some(t=>ax.b.includes(t));
+  return a===b ? null : (a?0:1);
+}
+// A player's answers, most recent first, counting only the latest answer to each dilemma.
+function answersOf(P){
+  const seen = new Set();
+  return [...P.history].reverse().filter(h=>!seen.has(h.id) && seen.add(h.id));
+}
+function optionOf(id, optId){
+  const d = dilemmaOf(id);
+  return d.options.concat(d.assumptions.filter(a=>a.unlock).map(a=>a.unlock)).find(o=>o.id===optId);
+}
+// Lean on an axis, from -1 to 1: how often each side was taken when it was offered. Measuring against what was
+// offered keeps common tags (duty is offered far more often than util) from looking like a leaning, and the +2
+// keeps a single answer from looking like a strong one.
+function leanOf(P, ax){
+  const offered = [0,0], taken = [0,0];
+  for(const h of answersOf(P)){
+    const opts = dilemmaOf(h.id).options;
+    [0,1].forEach(s=>{ if(opts.some(o=>sideOf(o,ax)===s)) offered[s]++; });
+    const s = sideOf(optionOf(h.id,h.choice), ax);
+    if(s!==null) taken[s]++;
+  }
+  return taken[0]/(offered[0]+2) - taken[1]/(offered[1]+2);
+}
+// The axis to test next. Alone: the strongest leaning. Together: whatever divides the table most.
+function targetAxis(){
+  const scored = shuffle(AXES).map(ax=>{
+    const leans = S.players.map(P=>leanOf(P,ax));
+    return [ax, group() ? Math.max(...leans)-Math.min(...leans) : Math.abs(leans[0])];
   });
+  const best = scored.reduce((x,y)=>y[1]>x[1]?y:x);
+  return best[1]>0 ? best[0] : null;
+}
+// Draw the rung being reached again, favouring dilemmas that offer a side of the target axis, and both sides most.
+function retarget(){
+  const r = RUNGS[S.rung], ax = r && targetAxis();
+  if(ax) S.plan[S.rung] = drawRung(r, id=>1+2*[0,1].filter(s=>DILEMMAS[id].options.some(o=>sideOf(o,ax)===s)).length);
+}
+// After a commit: if this answer leans against an earlier one, ask about it. At most once per rung, per player.
+function whatChangedNote(P, opt){
+  if(cur.final || P.noted===S.rung) return "";
+  for(const ax of shuffle(AXES)){
+    const s = sideOf(opt, ax);
+    if(s===null) continue;
+    const h = answersOf(P).find(h=>h.id!==cur.id && sideOf(optionOf(h.id,h.choice),ax)===1-s);
+    if(!h) continue;
+    P.noted = S.rung;
+    const said = fill(pick(SAY.whatChanged), {then:dilemmaOf(h.id).title, was:optionOf(h.id,h.choice).label, a:ax.words[1-s], b:ax.words[s]});
+    return `<div class="fb ask">${esc(said)}</div>`;
+  }
+  return "";
+}
+// At an avatar reveal: how the name compares with the last one. Empty at the first reveal.
+function shiftLine(prev, now){
+  if(!prev) return "";
+  return prev===now ? pick(SAY.sameName) : fill(pick(SAY.newName),{prev});
 }
 
 // Maximum Doubt and Tolerance in this run (per player). Doubt: 3 per dilemma for exposing every assumption, plus 2
@@ -290,10 +369,7 @@ function meters(){
     + (P.publicName ? ` · seen as ${P.publicName}` : "");
 }
 function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
-function labelOf(id, optId){
-  const d = dilemmaOf(id);
-  return d.options.concat(d.assumptions.filter(a=>a.unlock).map(a=>a.unlock)).find(o=>o.id===optId).label;
-}
+function labelOf(id, optId){ return optionOf(id,optId).label; }
 
 // ---------- FLOW ----------
 function start(){
@@ -439,7 +515,7 @@ function commit(){
   const counted = changed && !P.seenChange[cur.id] && Object.keys(P.seenChange).length < CHANGES;
   if(counted){ P.seenChange[cur.id]=1; P.doubt += 2; }
   P.history.push({id:cur.id, choice:cur.choice, first:cur.first||null, conf:cur.conf, examined:cur.shown});
-  cur.answers[S.turn] = { choice:cur.choice, msgs:personalMsgs(egoGain, changed, counted) };
+  cur.answers[S.turn] = { choice:cur.choice, msgs:personalMsgs(egoGain, changed, counted) + whatChangedNote(P, opt) };
   if(!group()) return renderSplit();
   // Group: private feedback, then pass on, or show the room how it split.
   cur.k++;
@@ -570,6 +646,7 @@ function avatarName(P){
 function avatarReveal(){
   if(group()) return roomReveal();
   const [en,mr] = avatarName(me());
+  const shift = shiftLine(me().publicName, `${en} · ${mr}`);
   me().publicName = `${en} · ${mr}`;
   // Other players get distinct names, never the player's own, shown in both languages like the player's.
   const names = shuffle(Object.values(AVATARS).filter(n=>n[0]!==en));
@@ -578,6 +655,7 @@ function avatarReveal(){
     <div class="sub">Avatar reveal · अवताराची ओळख</div>
     <p>Your avatar must now show its face to everyone on the network. Judging by your choices, it is:</p>
     <p class="big"><b>${esc(en)}</b> <span class="mr">${mr}</span></p>
+    ${shift?`<p class="auditor">${esc(shift)}</p>`:""}
     <p class="note">Everyone can now see this name next to yours. Also revealed this round (simulated):</p>
     <div class="others">${others}</div>
     <div class="row"><button onclick="reveal2(true)">Yes, that is me</button><button onclick="reveal2(false)">That is not who I am</button></div>
@@ -588,7 +666,7 @@ function avatarReveal(){
 let revealed = {};
 function roomReveal(){
   revealed = {};
-  S.players.forEach(P=>{ const [en,mr] = avatarName(P); P.publicName = `${en} · ${mr}`; });
+  S.players.forEach(P=>{ const [en,mr] = avatarName(P), now = `${en} · ${mr}`; P.shift = shiftLine(P.publicName, now); P.publicName = now; });
   renderRoomReveal();
 }
 function renderRoomReveal(){
@@ -598,6 +676,7 @@ function renderRoomReveal(){
     <p>Every avatar must now show its face to the room. Judging by your choices:</p>
     ${S.players.map((P,i)=>{ const [en,mr] = avatarName(P); return `<div class="revrow">
       <p class="big"><b>${esc(P.name)}</b>: ${esc(en)} <span class="mr">${mr}</span></p>
+      ${P.shift?`<p class="auditor">${esc(P.shift)}</p>`:""}
       ${i in revealed ? `<div class="fb ${revealed[i].ok?"ok":"no"}">${esc(revealed[i].msg)}</div>`
         : `<div class="row"><button onclick="reveal2(true,${i})">Yes, that is me</button><button onclick="reveal2(false,${i})">That is not who I am</button></div>`}
       </div>`; }).join("")}
@@ -631,6 +710,7 @@ function gate(){
   const behind = S.players.findIndex(P=>P.doubt < need);
   if(behind<0){
     S.rung++; S.step=0; S.turn=0;
+    retarget();
     save("card");
     return rungCard();
   }

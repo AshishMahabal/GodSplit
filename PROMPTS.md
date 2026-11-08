@@ -96,3 +96,16 @@
 
 **User:**
 > the dilemmas are fine. I did not make any change. Go ahead with building #4
+
+## Session 13 (2026-11-08)
+
+**User:**
+> I have pushed the current version. Let us see what we want to do in #5 before we raise trolley to 1 in 3
+
+## Session 14 (2026-11-08)
+
+**User:**
+> lets go with A B C. The note should not afttct the meters much. Yes, keep it curious
+
+**User:**
+> yes, raise trolley to 1 in 4. We will wait for reports back from 2-3 people

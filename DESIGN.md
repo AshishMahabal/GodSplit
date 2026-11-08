@@ -57,6 +57,7 @@ Other lines that set the game's purpose:
 ### Adaptive engine ("evolves")
 - Player model from tags on choices (utilitarian, loyalty, duty, later-reward, etc.).
 - Selector that picks the dilemma that most strains the current model (if you pull the lever, the one on the track becomes your sibling).
+- Built (session 14): tags grouped into four opposed axes (`AXES`). Each rung is drawn when reached, favouring the player's strongest leaning, or in a group what divides the table most. A "what changed?" note after an answer that leans against an earlier one, at most once per rung. The second avatar reveal says whether the name moved. None of it touches the meters.
 - Later: LLM-generated variants with human review. Generated text needs a review queue before going live, because religious content is sensitive.
 
 ### Social ("talk but never agree")

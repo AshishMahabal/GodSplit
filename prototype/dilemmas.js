@@ -954,6 +954,16 @@ const VARIANTS = {
   }]
 };
 
+// ---------- AXES ----------
+// Opposed pairs of tags, used to notice how a player leans (adaptation only, never scored).
+// words: how each side is named when the game asks "what changed?".
+const AXES = [
+  {a:["duty"],              b:["util"],             words:["the rule","the result"]},
+  {a:["continuity","stay"], b:["change","switch"],  words:["holding on","letting go"]},
+  {a:["loyal"],             b:["we"],               words:["your own","the many"]},
+  {a:["now","world"],       b:["later","seeker"],   words:["what you can have now","what you don't yet know"]},
+];
+
 // ---------- RUNGS ----------
 // Each rung draws PER_RUNG dilemmas at random from its pool.
 // "trolley" is a chain: it is always followed by its adaptive sequel, and the pair uses two slots.
@@ -972,6 +982,8 @@ const RUNGS = [
    about:"Who is doing the choosing? You, your avatar, a machine, or the answers someone handed you."},
 ];
 const CHAINS = { trolley:"ADAPT_TROLLEY" };
+// Dilemmas with a fixed chance of being drawn in a run, whatever the other weights are.
+const CHANCE = { trolley:0.25 };
 // What each trolley answer looks like when the sequel reminds the player of it.
 const EARLIER = { pull:"you pulled it", leave:"you chose not to pull it", shout:"you shouted a warning instead of pulling it" };
 const FINAL = "rank";

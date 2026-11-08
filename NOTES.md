@@ -159,7 +159,23 @@ Item 2, polish:
 - Side effect, author's call: the trolley chain is now in 1 run in 8 (it was 1 in 4), measured over 100,000 draws. It is the only adaptive branch, and the story's own question. It could be weighted up, or plan item 5 may make this matter less.
 - Not done: a larger pool of caricatures per side. With 46 dilemmas, repeats are much rarer, so this can wait for playtest evidence.
 
+## 2026-11-08: Session 13 (planning item 5, nothing built yet)
+- Author pushed session 12. Trolley frequency is on hold until item 5 is decided.
+- Tags as they stand are lopsided on the main options (duty 21, change 16, later 3), and Doors uses now/later/stay/switch, which rarely appear higher up. Proposal given to the author: group tags into four opposed axes (rule/result, hold/change, mine/many, here/beyond), then a targeted rung draw, a "what changed?" note after a commit that leans against an earlier answer, and the second avatar reveal naming any shift. No meter effect. Waiting for the author's choice.
+
+## 2026-11-08: Session 14 (plan item 5: adaptation)
+Author chose A, B and C, with a curious tone. "Should not affect the meters much": built with no meter effect at all.
+- `AXES` in dilemmas.js: duty/util, continuity+stay/change+switch, loyal/we, now+world/later+seeker. An option with tags on both sides of an axis counts as neither. No dilemma was re-tagged.
+- Few dilemmas put both sides of an axis head to head (Gods: 2 of 10), so the design compares across dilemmas, and a dilemma counts if it offers either side.
+- A, the note: after a commit, if the answer leans against an earlier one on some axis: "Earlier, at X, you chose Y and leaned toward the rule. Here you leaned toward the result. Both can be true. What changed?" Three wordings. At most once per rung per player, not on the final rank, never compared with the same dilemma, and it uses only the latest answer to each dilemma. In a group it stays on the player's private card.
+- B, targeted draw: `retarget()` draws each rung again when it is reached, keeping its length, so meter maxima and gates don't change. Rung 1 stays random. Weight 1 for a dilemma offering neither side of the target axis, 3 for one side, 5 for both. Target: the strongest leaning, or in a group the axis with the widest spread. Leaning = taken/(offered+2) for one side minus the same for the other, so common tags and single answers don't look like a leaning.
+- C, reveal: the second reveal says whether the name moved. Three wordings each way, solo and group.
+- Measured, 2000 scripted runs per kind of player (`sim.js adaptstats`). Notes per run: about 3 if random, 2.7 if always choosing results, 2.3 if always holding on, 1.8 if always choosing rules. Runs with no note: 1 to 15%, highest for rule-followers. Share of dilemmas (rungs 2 to 5) on their own axis: rules 68% against 59% untargeted, holders 50% against 43%, results 60% against 59%, so targeting is modest, and barely helps those who favour results, because util is offered less. The name moved at the second reveal in about 75% of runs. These are scripted players, not people.
+- Trolley: B alone took it to about 1 run in 10 (it was 1 in 8), because B favours other dilemmas when the target isn't rule or result, and at rung 2 it rarely is: Doors offers no rule-or-result choices. Author chose 1 in 4. `CHANCE` in dilemmas.js fixes this, whatever the targeting does. The other seven Bodies dilemmas share the remaining draws.
+- Tests: `sim.js adapt` (in test.sh) checks when the note fires and doesn't, once per rung, no meter change, group privacy, rung lengths, no target before any answer, reveal lines, and the trolley's 1 in 4 before and after targeting. `validate.js` checks the axes and `CHANCE`.
+
 ## Where things stand (end of 2026-11-08)
-- Done: plan items 1 (scoring), 2 (beta polish), 3 (pass-and-play), 4 (variants and more dilemmas). All tests pass (`tools/test.sh`). Nothing committed by Claude, the author commits.
-- Next: the author reads the new content in `dilemmas-review-batch2.md`, and decides on the trolley's frequency. Then, when asked: 5 adaptation by tags, 6 backend, share card, Marathi UI.
+- Done: plan items 1 (scoring), 2 (beta polish), 3 (pass-and-play), 4 (variants and more dilemmas), 5 (adaptation). All tests pass (`tools/test.sh`). Nothing committed by Claude, the author commits.
+- The three `dilemmas-review*` files went in with the author's push (commit bec1497), so they are tracked now, despite what sessions 11 and 12 say above. They are snapshots of `prototype/dilemmas.js`, which remains the source.
+- Next: waiting for reports back from 2 or 3 people playing. The author also still has `dilemmas-review-batch2.md` to read. Decide after the reports: reveal budget, run length (2 or 3 per rung), group extras, whether the note and the name shift fire too often. Item 6 (backend, share card, Marathi UI) only after that, and when asked.
 - Before announcing: try a round of pass-and-play with 2 or 3 real people on a phone.
