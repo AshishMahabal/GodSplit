@@ -25,7 +25,7 @@ s = open("prototype/index.html").read()
 narrow = f"html{{width:{w}px;overflow-x:hidden}}" if w < 500 else ""
 s = s.replace("</head>", "<style>*{transition:none!important}" + narrow + "</style></head>", 1)
 go = f'showDilemma("{did}");' if did else ""
-s = s.replace("</body>", f"<script>setTimeout(()=>{{unlock();{go}}},50)</script></body>", 1)
+s = s.replace("</body>", f"<script>setTimeout(()=>{{store("gs_intro","1");unlock();{go}}},50)</script></body>", 1)
 open(out, "w").write(s)
 EOF
 "$CHROME" --headless=new --window-size=${WIDTH:-760},1300 --virtual-time-budget=2000 \

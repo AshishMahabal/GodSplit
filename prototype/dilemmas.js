@@ -163,7 +163,7 @@ const DILEMMAS = {
   },
   fifthhead: {
     title:"The Fifth Head", mr:"पाचवं मुख",
-    text:"It is 2046. On a mountain stands a giant golden head. One day it began to broadcast a single message to the whole universe: 'I alone am god.' Since then the stars have been going dark, one by one.\n\nIn the old myth, the god Brahma grew a fifth head that claimed to be above all others, and Shiva, as Kalabhairava, cut it off. You can reach this head, and you have the means to cut it off too.",
+    text:"It is 2046. On a mountain stands a giant golden head, with one golden hand raised in blessing. Every hour or two, the hand moves down and up. One day the head began to broadcast a single message to the whole universe: 'I alone am god.' Since then the stars have been going dark, one by one.\n\nIn the old myth, the god Brahma grew a fifth head that claimed to be above all others, and Shiva, as Kalabhairava, cut it off. You can reach this head, and you have the means to cut it off too.",
     src:"The story नैकेश्वर, and the Puranic myth of Brahma's fifth head.",
     options:[{id:"cut",label:"Cut off the head, and carry the sin of it",tags:["util"]},{id:"leave",label:"Leave it. It is only a statue",tags:["duty"]}],
     assumptions:[

@@ -96,6 +96,22 @@ body.gaze main{opacity:0;pointer-events:none}
 #gaze b{font-size:40px;font-weight:600;color:var(--accent);animation:rise .6s .3s both}
 #gaze span{color:var(--muted);font-size:14px;animation:rise .6s .5s both}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}}
+/* The golden figure: the opening, the Fifth Head, the ending. The hand is moved from the star loop. */
+#stage{position:fixed;inset:0;z-index:4;display:none;overflow:hidden;cursor:pointer}
+body.stage #stage{display:block}
+body.stage main{opacity:0;pointer-events:none}
+.fig{display:block;overflow:visible}
+#stage .fig{position:absolute;left:50%;bottom:-5%;width:min(96vw,520px);transform:translate(-50%,105%);transition:transform 1.3s ease-out;filter:drop-shadow(0 0 16px #f2c14e55)}
+#stage .fig.up{transform:translate(-50%,0)}
+.fig .ear,.fig .headg{transition:transform 1.3s ease-in-out}
+.fig.turned .ear{transform:translateX(9px)}
+.fig.turned .headg{transform:translateX(-3px)}
+#stage .line{position:absolute;top:18%;left:16px;right:16px;text-align:center;font:20px ui-monospace,Menlo,monospace;color:var(--accent);opacity:0;transition:opacity .6s}
+#stage .line.on{opacity:1}
+#stage .skip{position:absolute;top:12px;right:12px;background:none;border:0;color:var(--muted);font-size:13px}
+.closeup{height:170px;margin:-4px 0 12px;border-radius:10px;overflow:hidden;background:#07080d}
+.closeup .fig{width:100%;height:100%;overflow:hidden;filter:drop-shadow(0 0 10px #f2c14e44)}
+button.quiet{background:none;border:0;padding:4px 0;font-size:13px;color:var(--muted);text-align:center}
 /* The third way: a door that wasn't there. */
 button.third{border:1px dashed var(--accent)}
 button.door{animation:door 1.2s ease-out both;transform-origin:center}
@@ -135,6 +151,11 @@ button.door{animation:door 1.2s ease-out both;transform-origin:center}
 <body>
 <canvas id="sky"></canvas>
 <div id="gaze" role="status"></div>
+<div id="stage"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="0" y1="30" x2="0" y2="240"><stop offset="0" stop-color="#ffe29a"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#7a5a18"/></linearGradient>
+  <linearGradient id="figfill" gradientUnits="userSpaceOnUse" x1="0" y1="30" x2="0" y2="240"><stop offset="0" stop-color="#3d2d0d"/><stop offset=".45" stop-color="#1b1407"/><stop offset="1" stop-color="#07070a"/></linearGradient>
+</defs></svg>
 <main>
   <header>
     <h1>God Split <small>गॉडस्प्लिट</small></h1>
@@ -385,12 +406,23 @@ function initStars(){
 function lit(){ return Math.round(progress()*stars.length); }
 // shownN is how many stars the sky shows. It catches up with lit() at set moments, so a star lights when it can be seen.
 // A star lights at its own time (s.at), with a flare. pulseAt makes the dark stars stir, when a third way opens.
-let shownN = 0, pulseAt = -1e9;
+const calm = typeof matchMedia==="function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+let shownN = 0, pulseAt = -1e9, scene = null;
+// Move every golden hand on screen. It rests raised, and dips down and up: d ms in every p ms, starting at t, until stop.
+// Driven by the clock and not by CSS, so redrawing a card doesn't restart it.
+function moveHands(t){
+  if(calm) return;
+  document.querySelectorAll(".fig-hand").forEach(el=>{
+    const {p,d,t:from,stop} = el.dataset, phase = (t-from)%p;
+    const dip = t<+from || t>+stop || phase>=+d ? 0 : Math.sin(Math.PI*phase/d);
+    el.setAttribute("transform", `rotate(${(100*dip).toFixed(1)} 218 152)`);
+  });
+}
 function drawStars(t){
   cx.fillStyle="#07080d"; cx.fillRect(0,0,cv.width,cv.height);
   const d = devicePixelRatio, pulse = Math.max(0, 1-(t-pulseAt)/1100);
   stars.forEach((s,i)=>{
-    const since = t-(s.at||-1e9), on = i<shownN && since>=0, flare = on ? Math.max(0,1-since/900) : 0;
+    const since = t-(s.at||-1e9), on = scene ? t<s.outAt : i<shownN && since>=0, flare = on && !scene ? Math.max(0,1-since/900) : 0;
     const a = on ? Math.min(1,.55+.45*Math.sin(t/900+s.p)+flare) : .18+.55*pulse;
     const x = s.x*cv.width, y = s.y*cv.height;
     if(flare>0){
@@ -401,6 +433,13 @@ function drawStars(t){
     cx.fillStyle = on ? `rgba(255,236,190,${a})` : `rgba(140,150,170,${a})`;
     cx.beginPath(); cx.arc(x, y, s.r*d*(on?1.3:1), 0, 6.283); cx.fill();
   });
+  if(scene) scene.pulses.forEach(at=>{
+    const age = t-at;
+    if(age<0 || age>1500) return;
+    cx.strokeStyle = `rgba(242,193,78,${.45*(1-age/1500)})`; cx.lineWidth = 2*d;
+    cx.beginPath(); cx.arc(scene.x, scene.y, age*scene.speed, 0, 6.283); cx.stroke();
+  });
+  moveHands(t);
   requestAnimationFrame(drawStars);
 }
 addEventListener("resize", initStars); initStars(); shownN = lit(); requestAnimationFrame(drawStars);
@@ -412,7 +451,6 @@ function igniteTo(to, wait, spread){
 }
 // Between dilemmas: if stars were lit, the card steps aside to show them. A tap moves on sooner.
 const BEAT_MS = 2200;
-const calm = typeof matchMedia==="function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 function skyBeat(next){
   const from = shownN, to = lit();
   if(to<=from || calm){ igniteTo(to,0,0); shownN = to; return next(); }
@@ -481,7 +519,8 @@ function start(){
     <div class="opts">${S.resume
       ? `<button class="primary" onclick="resume()">Continue${group()?` (${S.players.map(p=>esc(p.name)).join(", ")})`:""}: rung ${Math.min(S.rung+1,RUNGS.length)} of ${RUNGS.length}</button><button onclick="clearSave();location.reload()">Start over</button>`
       : `<button class="primary" onclick="rungCard()">Play alone</button><button onclick="groupSetup()">Play together on one device (2 to 5 people)</button>`}
-      ${loadSkies().length?`<button onclick="skiesView()">Your skies (${loadSkies().length})</button>`:""}</div></div>`;
+      ${loadSkies().length?`<button onclick="skiesView()">Your skies (${loadSkies().length})</button>`:""}
+      <button class="quiet" onclick="intro(start)">Watch the opening again</button></div></div>`;
   store("gs_help","1");
   meters();
 }
@@ -567,6 +606,7 @@ function renderDilemma(){
   const more = cur.shown < cur.assume.length;
   V.innerHTML = `<div class="card">
     ${group()?`<div class="sub">${esc(me().name)}, in private</div>`:""}
+    ${cur.id==="fifthhead" ? `<div class="closeup">${figSVG("44 22 285 150", {p:5200,d:1500,t:0,stop:1e12})}</div>` : ""}
     <h2>${esc(d.title)}</h2><div class="mr">${d.mr}</div>
     ${dilemmaText(d).split("\n\n").map(t=>`<p>${esc(t)}</p>`).join("")}
     ${d.src?`<div class="src">${esc(d.src)}</div>`:""}
@@ -731,7 +771,7 @@ function steel(i){
 }
 
 function afterDilemma(){
-  if(cur.final) return ending();
+  if(cur.final) return finale(ending);
   skyBeat(advance);
 }
 function advance(){
@@ -841,6 +881,73 @@ function rankLine(P){
   return group() ? `Ask the others at the table. They will not agree.`
     : `The others gave you ${3+Math.floor(Math.random()*4)} different ranks. None of them agree.`;
 }
+// ---------- THE GOLDEN FIGURE ----------
+// Seen from behind: we stand where it stands, looking at the sky it is destroying. It never shows its face.
+function figSVG(box, hand, cls){
+  const rim = `stroke="url(#gold)" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"`;
+  const head = "M104 136 C88 122 78 104 78 84 C78 54 97 36 120 36 C143 36 162 54 162 84 C162 104 152 122 136 136";
+  return `<svg class="fig ${cls||""}" viewBox="${box}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path fill="url(#figfill)" d="M-15 245 C-10 208 28 190 76 178 C92 174 102 166 104 134 L136 134 C138 166 148 174 164 178 C178 180 190 164 204 142 L232 158 L208 205 L208 245 Z"/>
+    <path fill="none" ${rim} d="M-15 245 C-10 208 28 190 76 178 C92 174 102 166 104 134 M136 134 C138 166 148 174 164 178 C178 180 190 164 204 142 M232 158 L208 205 L208 245"/>
+    <g class="fig-hand" data-p="${hand.p}" data-d="${hand.d}" data-t="${hand.t}" data-stop="${hand.stop}">
+      <path fill="url(#figfill)" ${rim} d="M198 86 C190 84 184 74 185 66 C186 60 192 61 194 67 C195 72 197 75 198 77 Z"/>
+      <path fill="url(#figfill)" ${rim} d="M206 156 L206 104 C200 100 198 94 198 86 L198 54 Q198 48 202.5 48 Q207 48 207 54 L207 70 L208 46 Q208 40 212.5 40 Q217 40 217 46 L217 70 L218 44 Q218 38 222.5 38 Q227 38 227 44 L227 70 L228 50 Q228 44 232.5 44 Q237 44 237 50 L237 86 C237 94 234 100 230 104 L230 156 C226 162 210 162 206 156 Z"/>
+    </g>
+    <ellipse class="ear" cx="154" cy="90" rx="6" ry="13" fill="url(#figfill)" ${rim}/>
+    <g class="headg"><path fill="url(#figfill)" d="${head} Z"/><path fill="none" ${rim} d="${head}"/></g>
+  </svg>`;
+}
+// A full-screen scene over the sky. steps are [ms, fn]. Any tap ends it. Then done() runs, once.
+function playStage(html, steps, endMs, done){
+  $("stage").innerHTML = html + `<button class="skip">Skip</button>`;
+  document.body.classList.add("stage");
+  let over = false;
+  const finish = () => {
+    if(over) return; over = true;
+    timers.forEach(clearTimeout);
+    scene = null;
+    document.body.classList.remove("stage");
+    $("stage").innerHTML = "";
+    done();
+  };
+  $("stage").onclick = finish;
+  const timers = steps.map(([ms,f])=>setTimeout(()=>{ if(!over) f(); }, ms));
+  timers.push(setTimeout(finish, endMs));
+}
+const onStage = (sel,fn) => { const el = document.querySelector("#stage "+sel); if(el) fn(el); };
+// The opening. A full sky. The figure rises, its hand dips, and each dip sends out a wave that puts out the next
+// stars, nearest first. Shown once on each device, and any tap skips it. Then the sky is as the game begins: dark.
+function intro(done){
+  store("gs_intro","1");
+  const line = `<div class="line${calm?" on":""}">I alone am god.</div>`;
+  if(calm) return playStage(figSVG("-15 0 300 240",{p:1,d:0,t:0,stop:0},"up") + line, [], 3000, done);
+  const now = performance.now(), W = cv.width, H = cv.height, d = devicePixelRatio;
+  // Where the head is on screen, from the figure's size in the CSS.
+  const w = Math.min(.96*innerWidth,520)*d, h = w*.8;
+  const x = (W-w)/2 + w*(135/300), y = H + .05*H - h + h*(94/240);
+  const pulses = [2400,3200,4000,4800].map(ms=>now+ms);
+  const far = Math.hypot(Math.max(x,W-x), Math.max(y,H-y)), speed = far/1100;
+  [...stars].map(s=>[s,Math.hypot(s.x*W-x,s.y*H-y)]).sort((a,b)=>a[1]-b[1]).forEach(([s,dist],rank)=>{
+    s.outAt = pulses[Math.floor(rank*pulses.length/stars.length)] + dist/speed;
+  });
+  scene = { pulses, x, y, speed };
+  playStage(figSVG("-15 0 300 240",{p:800,d:800,t:now+2000,stop:now+5600}) + line, [
+    [1000, ()=>onStage(".fig", el=>el.classList.add("up"))],
+    [4500, ()=>onStage(".line", el=>el.classList.add("on"))],
+    [5800, ()=>onStage(".fig", el=>el.classList.add("turned"))],
+  ], 7800, done);
+}
+// Before the verdict: the stars this run earned light, with the figure in front of them. On a strong verdict it is
+// there, and then it isn't: no fall and no fade, as in the story. Otherwise its hand just keeps going.
+function finale(done){
+  if(calm) return done();
+  igniteTo(lit(), 300, 1500);
+  const now = performance.now();
+  const strong = progress() >= 0.75;
+  playStage(figSVG("-15 0 300 240",{p:2400,d:1000,t:now+300,stop:1e15},"up"),
+    strong ? [[2300, ()=>onStage(".fig", el=>el.remove())]] : [], strong ? 3700 : 3400, done);
+}
+
 // ---------- YOUR SKIES ----------
 // Each finished run draws a constellation from the player's answers, climbing from the bottom like the ladder.
 // Across: set by the dilemma and the answer, so the same choices draw the same shape. Size: how much was questioned.
@@ -946,7 +1053,10 @@ function tryWord(e){
   if(wordHash($("word").value) === SECRET_HASH){ store("gs_word", SECRET_HASH); unlock(); }
   else $("lockfb").innerHTML = `<div class="fb no">${esc(pick(["That is not the word.","The screen stays shut.","Not that one. Doubt your first guess."]))}</div>`;
 }
-function unlock(){ document.body.classList.remove("locked"); start(); }
+function unlock(){
+  document.body.classList.remove("locked");
+  if(store("gs_intro") || S.resume) start(); else intro(start);
+}
 if(store("gs_word") === SECRET_HASH) unlock(); else lockScreen();
 </script>
 </body>

@@ -197,6 +197,16 @@ Author chose the minimal starfield style and the first three items.
 - Tests: new `sim.js look` covers these. Also played a whole run in real headless Chrome with real timers: no script errors, no sideways overflow. Looked at phone-width screenshots of each screen, including 320px. Headless Chrome freezes CSS animations, so those were checked at fixed frames only. The motion itself has not been seen by anyone.
 - Party mode (own devices, in one room) written up in DESIGN.md as a separate idea, not built.
 
+## 2026-11-08: Session 17 (the opening and the golden figure)
+The author's idea: open on the starfield, stars going out, a golden head seen from behind with its hand moving up and down, then the opening screen. The story already has the hand (a hydraulic cable, raised in blessing, moving every hour or two), the slow turn, and the head vanishing without falling.
+- Opening, about 8 seconds, first visit on a device only (`gs_intro`), after the secret word, and not when a saved run exists. Any tap skips it, and the start screen offers "Watch the opening again". Full sky, the figure rises, the hand dips 4 times, each dip sends a ring out that puts out the next stars, nearest first (measured: 120, 90, 67, 60, 30, 0 by 6 seconds), "I alone am god.", then a slight turn showing an ear, never the face, then the start screen over the dark sky. Under reduced motion: a still figure and the line, for 3 seconds.
+- Fifth Head: the figure is at the top of that dilemma's card, close up, its hand dipping every 5 seconds or so. The hand is moved by the clock in the star loop, so redrawing the card on a tap doesn't restart it.
+- Ending: before the verdict, the stars this run earned light with the figure in front. On a strong verdict it is there and then it isn't, with no fall and no fade. Otherwise its hand keeps going. About 3.5 seconds, skippable. Skipped under reduced motion.
+- Drawn as a dark form with a gold rim, in code, seen from behind, with no face and no name. First try, solid gold, looked like a restroom sign. A closed hand looked like a raised fist, so it is an open palm.
+- Changed the Fifth Head's text to mention the hand: "with one golden hand raised in blessing. Every hour or two, the hand moves down and up." The author should read it.
+- `tools/shot.sh` now skips the opening. `sim.js look` covers it.
+- Checked at fixed frames in headless Chrome, whose animation and redraws are unreliable under virtual time. The motion has not been seen by anyone.
+
 ## Where things stand (end of 2026-11-08)
 - Done: plan items 1 (scoring), 2 (beta polish), 3 (pass-and-play), 4 (variants and more dilemmas), 5 (adaptation). All tests pass (`tools/test.sh`). Nothing committed by Claude, the author commits.
 - The three `dilemmas-review*` files went in with the author's push (commit bec1497), so they are tracked now, despite what sessions 11 and 12 say above. They are snapshots of `prototype/dilemmas.js`, which remains the source.

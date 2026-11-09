@@ -12,7 +12,7 @@ global.addEventListener=()=>{};global.requestAnimationFrame=()=>{};global.scroll
 // The sky interlude waits on a timer. Here it runs at once, so a playthrough stays synchronous.
 global.setTimeout=f=>f();
 eval(fs.readFileSync(path.join(__dirname,'g.js'),'utf8')+`
-;global.G={get shownN(){return shownN},cls,skyBeat,makeSky,saveSkies,loadSkies,skySVG,skiesView,start,ending,SKIES_KEY,SKIES_MAX,toggleHud,AXES,RUNGS,sideOf,leanOf,targetAxis,retarget,whatChangedNote,shiftLine,EARLIER,showDilemma,VARIANTS,dilemmaOf,save,AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,loadSave,SAVE_KEY,DMAX,LS,wordHash,S,get cur(){return cur},newPlayer,turn,renderDilemma,roomSplit,steelTurn,progress,nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
+;global.G={get scene(){return scene},intro,finale,figSVG,unlock,get shownN(){return shownN},cls,skyBeat,makeSky,saveSkies,loadSkies,skySVG,skiesView,start,ending,SKIES_KEY,SKIES_MAX,toggleHud,AXES,RUNGS,sideOf,leanOf,targetAxis,retarget,whatChangedNote,shiftLine,EARLIER,showDilemma,VARIANTS,dilemmaOf,save,AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,loadSave,SAVE_KEY,DMAX,LS,wordHash,S,get cur(){return cur},newPlayer,turn,renderDilemma,roomSplit,steelTurn,progress,nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
 function unlockGate(){
   // Page must open on the lock screen; a wrong word keeps it shut; the right hash opens it.
   if(!cls.has('locked')||!G.V.innerHTML.includes('secret word')) throw Error('gate not shown');
@@ -347,7 +347,32 @@ if(process.argv[2]==='reveal'){
   const g=G.loadSkies();
   if(g.length!==2||g[0].who!=='Asha'||g[1].who!=='Bo') bad.push('group skies wrong');
   if((G.V.innerHTML.match(/<svg/g)||[]).length!==2) bad.push('group ending should show 2 constellations');
-  console.log(bad.length?'LOOK FAIL: '+bad.join('; '):'look ok: third way, sky interlude, slim bar and constellations behave');
+  // The opening: once per device, skipped for a saved run, leaving the sky as it was and no scene running.
+  delete G.LS.gs_intro; S.mode='solo'; S.players=[G.newPlayer('You')]; S.resume=null;
+  G.unlock();
+  if(G.LS.gs_intro!=='1') bad.push('opening not remembered');
+  if(G.cls.has('stage')) bad.push('opening stayed on screen');
+  if(G.scene) bad.push('opening left its scene running');
+  if(!G.V.innerHTML.includes('The stars have gone dark')) bad.push('opening did not lead to the start screen');
+  if(!G.V.innerHTML.includes('Watch the opening again')) bad.push('no way to watch it again');
+  delete G.LS.gs_intro; S.resume='next'; G.unlock();
+  if(G.LS.gs_intro) bad.push('saved run should go straight on, without the opening');
+  S.resume=null;
+  // The figure: on the Fifth Head and nowhere else, and it never needs a face.
+  G.showDilemma('fifthhead',false);
+  if(!G.V.innerHTML.includes('closeup')) bad.push('no figure at the Fifth Head');
+  if(!/hand raised in blessing/.test(G.DILEMMAS.fifthhead.text)) bad.push('Fifth Head text should mention the hand');
+  G.showDilemma('dog',false);
+  if(G.V.innerHTML.includes('closeup')) bad.push('figure on another dilemma');
+  // The ending: both verdicts pass through the finale and arrive at the Auditor.
+  for(const [doubt,tol,want] of [[42,24,'audit is complete'],[2,0,'audit continues']]){
+    S.mode='solo'; S.players=[G.newPlayer('You')]; const Q=S.players[0];
+    Q.doubt=doubt; Q.tol=tol; Q.history.push({id:G.FINAL,choice:'show',first:null,examined:1});
+    let arrived=false; G.finale(()=>{arrived=true; G.ending();});
+    if(!arrived||!G.V.innerHTML.includes(want)) bad.push('finale did not reach: '+want);
+    if(G.cls.has('stage')) bad.push('finale stayed on screen');
+  }
+  console.log(bad.length?'LOOK FAIL: '+bad.join('; '):'look ok: third way, sky interlude, slim bar, constellations, opening and figure behave');
 } else if(process.argv[2]==='resume'){
   // Play part of a run, then check the saved state loads back the same, and that a bad save is dropped.
   play('doubter',5);

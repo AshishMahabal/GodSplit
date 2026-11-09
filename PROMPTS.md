@@ -135,3 +135,9 @@
 
 **User:**
 > how do I go to phone view in dev tools?
+
+**User:**
+> I saw the stars after I completed something. But shouldn't we open with the starfield. Maybe even stars going blank? The golden head appears - seen from the back with hand going up and down like hello kitty. Then the opening screen appears. Thoughts?
+
+**User:**
+> #1 - yes, show the line. #2 - turn only slightly build the two returns
