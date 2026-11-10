@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Headless playthrough of prototype/index.html with a stubbed DOM.
-// Usage: node sim.js <doubter|changer|middle|lazy|decoy|group|reach|reveal|resume|earlier|variants|adapt|adaptstats|look>
+// Usage: node sim.js <doubter|changer|middle|lazy|decoy|group|reach|reveal|resume|earlier|variants|adapt|adaptstats|look|practice>
 const fs=require('fs'), path=require('path');
 const el=()=>({style:{},textContent:'',innerHTML:'',setAttribute(){},getContext:()=>new Proxy({},{get:()=>()=>({addColorStop(){}})}),classList:{add(){},remove(){}}});
 const els={};
@@ -12,7 +12,7 @@ global.addEventListener=()=>{};global.requestAnimationFrame=()=>{};global.scroll
 // The sky interlude waits on a timer. Here it runs at once, so a playthrough stays synchronous.
 global.setTimeout=f=>f();
 eval(fs.readFileSync(path.join(__dirname,'g.js'),'utf8')+`
-;global.G={get scene(){return scene},intro,finale,figSVG,unlock,get shownN(){return shownN},cls,skyBeat,makeSky,saveSkies,loadSkies,skySVG,skiesView,start,ending,SKIES_KEY,SKIES_MAX,toggleHud,AXES,RUNGS,sideOf,leanOf,targetAxis,retarget,whatChangedNote,shiftLine,EARLIER,showDilemma,VARIANTS,dilemmaOf,save,AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,loadSave,SAVE_KEY,DMAX,LS,wordHash,S,get cur(){return cur},newPlayer,turn,renderDilemma,roomSplit,steelTurn,progress,nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit};`);
+;global.G={get scene(){return scene},intro,finale,figSVG,unlock,get shownN(){return shownN},cls,skyBeat,makeSky,saveSkies,loadSkies,skySVG,skiesView,start,ending,SKIES_KEY,SKIES_MAX,toggleHud,AXES,RUNGS,sideOf,leanOf,targetAxis,retarget,whatChangedNote,shiftLine,EARLIER,showDilemma,VARIANTS,dilemmaOf,save,AVATARS,avatarReveal,buildPlan,DILEMMAS,FINAL,tryWord,SECRET_HASH,loadSave,SAVE_KEY,DMAX,LS,wordHash,S,get cur(){return cur},newPlayer,turn,renderDilemma,roomSplit,steelTurn,progress,nextDilemma,reveal,choose,conf,commit,steel,afterDilemma,reveal2,gate,replay,V,lit,begin,practice,endPractice,rungCard,GLYPHS,EMBLEMS,avatarTag};`);
 function unlockGate(){
   // Page must open on the lock screen; a wrong word keeps it shut; the right hash opens it.
   if(!cls.has('locked')||!G.V.innerHTML.includes('secret word')) throw Error('gate not shown');
@@ -66,6 +66,42 @@ if(process.argv[2]==='reveal'){
     if(others.length!==6||new Set(others).size!==6||others.includes(me)) bad++;
   }
   console.log(bad?'REVEAL FAIL in '+bad+' of 500':'reveal ok: 6 distinct bilingual names, never the player\'s own');
+} else if(process.argv[2]==='practice'){
+  // The practice round: one step at a time, counts for nothing, once per device, and the room plays it as one.
+  unlockGate();
+  const V=G.V, need=(ok,m)=>{ if(!ok) throw Error('practice: '+m); };
+  const runIt=()=>{
+    const c=G.cur; need(c.practice,'not the practice dilemma');
+    need(V.innerHTML.includes('Practice round')&&!V.innerHTML.includes('How sure')&&!V.innerHTML.includes('Question the premise')&&!V.innerHTML.includes('Commit'),'step 0 shows too much');
+    G.choose(c.opts[0].id);
+    need(V.innerHTML.includes('0 of 3 found')&&!V.innerHTML.includes('How sure'),'step 1');
+    G.reveal(); need(V.innerHTML.includes('1 of 3 found')&&V.innerHTML.includes('How sure')&&!V.innerHTML.includes('Commit'),'step 2');
+    need(G.S.players[0].doubt===1,'doubt should move during practice');
+    G.reveal(); G.reveal(); need(V.innerHTML.includes('All three found'),'all found');
+    G.conf('leaning'); need(V.innerHTML.includes('Commit'),'step 3');
+    G.commit(); need(V.innerHTML.includes('how others split')&&V.innerHTML.includes('Find the honest one'),'split coaching');
+    G.steel(c.args.findIndex(a=>a.kind==='ok'));
+  };
+  G.begin(); runIt();
+  need(els.steelfb.innerHTML.includes('Start the climb'),'end button');
+  G.afterDilemma();
+  const P=G.S.players[0];
+  need(V.innerHTML.includes('Climb on'),'should go on to the first rung');
+  need(P.doubt===0&&P.tol===0&&!P.history.length&&!Object.keys(P.seenA).length,'practice left a mark on the player');
+  need(G.LS.gs_tut==='1','not remembered');
+  G.begin(); need(V.innerHTML.includes('Climb on'),'practice shown twice');
+  // A real dilemma shows every step at once, and counts found assumptions.
+  G.nextDilemma(); need(V.innerHTML.includes('How sure')&&V.innerHTML.includes('Commit')&&V.innerHTML.includes('Practice round')===false,'real dilemma');
+  // From "How to play": back to the start screen.
+  G.start(); G.practice(G.start); runIt(); need(els.steelfb.innerHTML.includes('>Done<'),'replay end button'); G.afterDilemma();
+  need(V.innerHTML.includes('How to play'),'should return to the start screen');
+  // A room plays it once, together, with no hand-off, and keeps its names.
+  G.S.mode='group'; G.S.players=['Asha','Bo'].map(G.newPlayer); delete G.LS.gs_tut;
+  G.begin(); need(!V.innerHTML.includes('Pass the device')&&V.innerHTML.includes('together'),'group practice');
+  runIt(); G.afterDilemma();
+  need(G.S.players.map(p=>p.name).join()==='Asha,Bo'&&G.S.players.every(p=>!p.history.length),'group restored');
+  G.nextDilemma(); need(V.innerHTML.includes('Pass the device to Asha'),'group play after practice');
+  console.log('practice ok: one step at a time, counts for nothing, once per device, together in a room');
 } else if(process.argv[2]==='reach'){
   // Over many drawn ladders, every dilemma should turn up at least once.
   const seen=new Set([G.FINAL,'trolleyKin','trolleyKin2']);
@@ -372,7 +408,16 @@ if(process.argv[2]==='reveal'){
     if(!arrived||!G.V.innerHTML.includes(want)) bad.push('finale did not reach: '+want);
     if(G.cls.has('stage')) bad.push('finale stayed on screen');
   }
-  console.log(bad.length?'LOOK FAIL: '+bad.join('; '):'look ok: third way, sky interlude, slim bar, constellations, opening and figure behave');
+  // Star drawings: every avatar and rung has one, lines name real stars, and they show where they should.
+  for(const k of Object.keys(G.AVATARS)) if(!G.GLYPHS[k]) bad.push('no glyph for '+k);
+  if(G.EMBLEMS.length!==G.RUNGS.length) bad.push('one emblem per rung');
+  for(const a of [...Object.values(G.GLYPHS),...G.EMBLEMS]) if(a.l.flat().concat(a.big||[]).some(i=>!a.p[i])) bad.push('a drawing names a missing star');
+  G.S.rung=2; G.rungCard(); if(!/class="art ladder"/.test(G.V.innerHTML)||!/emblem draw/.test(G.V.innerHTML)) bad.push('rung card art');
+  const R=G.S.players[0]; R.publicName=null; R.glyph=undefined; R.tags={util:3}; G.avatarReveal();
+  if(!G.V.innerHTML.includes('revart')||G.V.innerHTML.includes(' old')||R.glyph!=='util') bad.push('first reveal art');
+  R.tags={util:3,change:5}; G.avatarReveal();
+  if(!G.V.innerHTML.includes('art old')||R.glyph!=='change') bad.push('name shift art');
+  console.log(bad.length?'LOOK FAIL: '+bad.join('; '):'look ok: third way, sky interlude, slim bar, constellations, opening and figure, star drawings behave');
 } else if(process.argv[2]==='resume'){
   // Play part of a run, then check the saved state loads back the same, and that a bad save is dropped.
   play('doubter',5);

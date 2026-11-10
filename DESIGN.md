@@ -34,6 +34,7 @@ Other lines that set the game's purpose:
 
 ## 3. Core loop (as built in the prototype)
 
+0. **Practice** (once per device): a short everyday dilemma, played one step at a time with a line of guidance for each. It counts for nothing.
 1. **Dilemma** appears with 2 options.
 2. **Pick a first answer, then question the premise** (optional): reveal hidden assumptions one by one. Some reveal a third, reframing option. Revealing is only possible once a first answer is picked.
 3. **Choose** an option and a **confidence** (certain / leaning / unsure).

@@ -964,6 +964,26 @@ const AXES = [
   {a:["now","world"],       b:["later","seeker"],   words:["what you can have now","what you don't yet know"]},
 ];
 
+// ---------- PRACTICE ----------
+// Played once before the first climb, to learn the steps. Everyday on purpose, and it counts for nothing.
+const PRACTICE = {
+  title:"The Painting", mr:"चित्र",
+  text:"A close friend has spent a year on a painting, and next week it goes into a show. They ask you, with real hope, whether it is good. You think it is not.\n\nWhat do you tell them?",
+  src:"A practice dilemma. The ladder starts after this one.",
+  options:[{id:"truth",label:"Tell them it isn't good",tags:["duty"]},{id:"kind",label:"Tell them it's good",tags:["loyal"]}],
+  assumptions:[
+    {t:"That your taste is the measure. Judges, buyers and friends disagree about paintings all the time."},
+    {t:"That a kind answer and a true answer can't be the same answer."},
+    {t:"That they are asking about the painting. After a year of work, the real question may be whether the year was worth it.",
+     unlock:{id:"ask",label:"Ask what they hope people will see in it, and talk about that",tags:["reframe"]}}
+  ],
+  split:{truth:38,kind:51,ask:11},
+  steel:{
+    truth:{good:"If you only ever praise, your praise stops meaning anything. Hearing it gently from you now may spare them a harder verdict from strangers next week.",bad:["The truth matters more than anyone's feelings.","Someone has to tell them they have no talent."]},
+    kind:{good:"Taste is uncertain, and the painting can't change in a week. What they need now is the nerve to show it, and your doubt can only take that away.",bad:["A small lie never hurt anyone.","It isn't your problem if strangers laugh at it."]}
+  }
+};
+
 // ---------- RUNGS ----------
 // Each rung draws PER_RUNG dilemmas at random from its pool.
 // "trolley" is a chain: it is always followed by its adaptive sequel, and the pair uses two slots.

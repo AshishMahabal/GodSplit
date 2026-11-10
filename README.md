@@ -27,6 +27,8 @@ During beta the game asks for a shared **secret word**. Ask the author for it. T
 
 Play **alone** (other players are simulated) or **together**: 2 to 5 people on one phone or laptop, passing it round. Each answers in private, the room sees the real split with names, and each player argues for someone else's actual answer. The avatar reveal happens in front of the room, the ladder only lets you climb together, and the sky is shared.
 
+Before the first climb there is a short practice dilemma that teaches the steps one at a time. It counts for nothing, plays once per device, and "How to play" on the start screen replays it.
+
 1. **A dilemma.** Two choices, and no answer is scored as right.
 2. **Pick a first answer, then question the premise.** Expose the assumptions the dilemma rests on. Some of them open a third way out. If what you find changes your answer, that counts most.
 3. **Commit, and say how sure you are.** Certainty is free once you have examined the question. Unexamined certainty feeds your **Ego**.
@@ -45,7 +47,7 @@ The three meters follow the Auditor's conditions in the story:
 
 ## Status
 
-Prototype **M1**: 46 dilemmas in 5 rungs (Doors, Bodies, Words, Gods, Mirrors), nine of them with a second version. Each run draws 2 per rung, so ladders differ between plays. The game adapts: later rungs lean toward what tests your choices so far, it asks "what changed?" when an answer leans against an earlier one, and the avatar reveal says whether your name has moved. One written branch follows the trolley. Stars light in a short interlude between dilemmas, and each finished run draws a constellation from your answers, kept in the browser under Your skies. The game opens on a full sky put out by a golden figure, which returns at the Fifth Head and at the ending. Solo or pass-and-play for 2 to 5 people. In solo play, other players' choices are simulated. A run is saved between dilemmas in the browser, so it can be continued later.
+Prototype **M1**: 46 dilemmas in 5 rungs (Doors, Bodies, Words, Gods, Mirrors), nine of them with a second version. Each run draws 2 per rung, so ladders differ between plays. The game adapts: later rungs lean toward what tests your choices so far, it asks "what changed?" when an answer leans against an earlier one, and the avatar reveal says whether your name has moved. One written branch follows the trolley. Stars light in a short interlude between dilemmas, and each finished run draws a constellation from your answers, kept in the browser under Your skies. The game opens on a full sky put out by a golden figure, which returns at the Fifth Head and at the ending. Each avatar name has its own constellation, drawn at the reveal, and each rung has an emblem and a ladder drawn in stars. Solo or pass-and-play for 2 to 5 people. In solo play, other players' choices are simulated. A run is saved between dilemmas in the browser, so it can be continued later.
 English first, with Marathi titles and lines from the story. Aimed at adult players.
 See [DESIGN.md](DESIGN.md) for the full plan and milestones.
 

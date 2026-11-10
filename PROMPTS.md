@@ -141,3 +141,11 @@
 
 **User:**
 > #1 - yes, show the line. #2 - turn only slightly build the two returns
+
+## Session 18 (2026-11-10)
+
+**User:**
+> I think we need a tutorial before people start playing. Also, the "only 3 left" made one player to think of minimizing the use of "assumptions". In general, should there be more graphics? Including for rungs, for instance? More visual. Same for avatars?
+
+**User:**
+> go ahead with 1 and 2, then 3

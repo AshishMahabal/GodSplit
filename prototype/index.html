@@ -111,6 +111,10 @@ body.stage main{opacity:0;pointer-events:none}
 #stage .skip{position:absolute;top:12px;right:12px;background:none;border:0;color:var(--muted);font-size:13px}
 .closeup{height:170px;margin:-4px 0 12px;border-radius:10px;overflow:hidden;background:#07080d}
 .closeup .fig{width:100%;height:100%;overflow:hidden;filter:drop-shadow(0 0 10px #f2c14e44)}
+.coach{border:1px solid #f2c14e66;background:#f2c14e12;border-radius:10px;padding:8px 12px;margin:-4px 0 14px}
+.coach p{margin:.2em 0}
+.coach button.quiet{padding:2px 0}
+.dots{color:var(--doubt);letter-spacing:2px}
 button.quiet{background:none;border:0;padding:4px 0;font-size:13px;color:var(--muted);text-align:center}
 /* The third way: a door that wasn't there. */
 button.third{border:1px dashed var(--accent)}
@@ -119,6 +123,34 @@ button.door{animation:door 1.2s ease-out both;transform-origin:center}
 .doorline{color:var(--accent);font-size:14px;margin:0;font-style:italic}
 .doorline.fresh{animation:rise .6s .5s both}
 .a-new{animation:rise .5s both}
+/* Star drawings: avatars, rung emblems, the ladder. */
+.art{display:block;overflow:visible}
+.art polyline{fill:none;stroke:#f2c14e8c;stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+.art circle{fill:#ffecbe}
+.art.draw polyline{stroke-dasharray:1;animation:draw 1.8s .4s ease-in-out both}
+.art.draw circle{animation:rise .5s both}
+.revart{position:relative;width:130px;height:130px;margin:8px auto 4px;filter:drop-shadow(0 0 8px #f2c14e55)}
+.revart .art{position:absolute;inset:0;width:100%;height:100%}
+.revart .old{animation:fadeout 1.6s ease-in both}
+.revart .old + .draw polyline{animation-delay:1.2s}
+.revart .old + .draw circle{animation-delay:1.2s!important}
+@keyframes fadeout{to{opacity:0}}
+.revrow .revart{width:80px;height:80px}
+.art.mini{display:inline-block;width:16px;height:16px;vertical-align:-3px;margin-right:6px}
+.art.mini polyline{stroke-width:6}
+.rungart{display:flex;justify-content:center;align-items:center;gap:28px;margin:4px 0 10px}
+.ladder{width:46px;height:100px}
+.ladder .rail{stroke:#ffecbe33;stroke-width:1}
+.ladder line{stroke:#ffecbe2e;stroke-width:1.4;stroke-dasharray:2 3}
+.ladder line.on{stroke:#f2c14e99;stroke-dasharray:none}
+.ladder line.now{stroke:var(--accent);stroke-width:2.4;stroke-dasharray:none;filter:drop-shadow(0 0 3px #f2c14e)}
+.ladder circle{fill:#8c96aa66}
+.ladder circle.on{fill:#ffecbe}
+.ladder circle.now{fill:#fff4d6;filter:drop-shadow(0 0 3px #f2c14e)}
+.emblem{width:96px;height:96px;filter:drop-shadow(0 0 8px #f2c14e44)}
+.card.marked{position:relative;overflow:hidden}
+.art.faint{position:absolute;top:10px;right:10px;width:110px;height:110px;opacity:.13;pointer-events:none}
+.card.marked > :not(.faint){position:relative}
 /* A run's constellation. */
 .constel{display:block;width:100%;max-width:260px;margin:6px auto}
 .constel polyline{fill:none;stroke:#ffecbe59;stroke-width:.5}
@@ -189,6 +221,48 @@ const AVATARS = {
   seeker:["The Seeker","जिज्ञासू"], reframe:["The Door-Questioner","शंकेखोर"], we:["The Many","अनेक"],
   stay:["The Steadfast","अढळ"], switch:["The Switcher","बदलणारा"], continuity:["The Rememberer","स्मरणारा"], change:["The River","नदी"]
 };
+
+// ---------- STAR DRAWINGS ----------
+// Avatars and rungs are drawn as constellations, like the sky: p is the stars (on a 100 by 100 grid),
+// l the lines through them (by star index), big the brighter stars.
+const GLYPHS = {
+  util:      {p:[[15,22],[15,78],[85,22],[85,78],[15,38],[30,38],[42,38],[85,38],[15,62],[58,62],[70,62],[85,62]], l:[[0,1],[2,3],[4,5,6,7],[8,9,10,11]], big:[5,6,9,10]}, // abacus
+  duty:      {p:[[25,85],[25,35],[38,18],[62,18],[75,35],[75,85],[36,50],[64,50],[36,66],[64,66]], l:[[0,1,2,3,4,5,0],[6,7],[8,9]]}, // tablet
+  loyal:     {p:[[22,50],[78,50],[50,32],[50,68]], l:[[0,2,1,3,0]], big:[0,1]},                                       // two stars, bound
+  now:       {p:[[50,50],[50,20],[80,50],[50,80],[20,50]], l:[[1,0,3],[4,0,2]], big:[0]},                               // one star, here
+  later:     {p:[[14,84],[32,74],[50,60],[66,44],[84,18]], l:[[0,1,2,3,4]], big:[4]},                                   // the long road up
+  world:     {p:[[25,85],[25,50],[50,24],[75,50],[75,85]], l:[[0,1,2,3,4,0],[1,3]]},                                    // house
+  seeker:    {p:[[18,84],[38,64],[28,44],[52,32],[70,46],[84,16]], l:[[0,1,2,3,4,5]], big:[5]},                         // a winding path
+  reframe:   {p:[[30,86],[30,18],[70,18],[70,86],[60,54],[88,40]], l:[[0,1,2,3]], big:[5]},                             // a doorway, and a star outside it
+  we:        {p:[[50,16],[80,34],[80,66],[50,84],[20,66],[20,34],[50,50]], l:[[0,1,2,3,4,5,0],[0,6,3],[5,6,2],[4,6,1]]}, // many, joined
+  stay:      {p:[[50,14],[50,38],[50,62],[50,86],[28,86],[72,86]], l:[[0,1,2,3],[4,3,5]], big:[0]},                     // a pillar
+  switch:    {p:[[20,22],[80,78],[80,22],[20,78],[50,50]], l:[[0,4,1],[2,4,3]], big:[4]},                               // two crossing roads
+  continuity:{p:[[50,16],[82,40],[70,80],[30,80],[18,40]], l:[[0,1,2,3,4,0]]},                                          // a closed ring
+  change:    {p:[[8,52],[26,34],[44,56],[62,36],[80,58],[94,42]], l:[[0,1,2,3,4,5]]},                                   // a river
+  none:      {p:[[30,40],[62,30],[50,70]], l:[]},                                                                         // unnamed: stars, no shape yet
+};
+// One emblem per rung, in order: Doors, Bodies, Words, Gods, Mirrors.
+const EMBLEMS = [
+  {p:[[12,86],[12,28],[42,28],[42,86],[58,86],[58,28],[88,28],[88,86]], l:[[0,1,2,3],[4,5,6,7]]},                       // two doors
+  {p:[[50,14],[50,34],[24,46],[76,46],[50,60],[34,88],[66,88]], l:[[2,1,3],[1,4],[5,4,6]], big:[0]},                     // a body
+  {p:[[14,24],[86,24],[86,64],[46,64],[30,84],[34,64],[14,64]], l:[[0,1,2,3,4,5,6,0]]},                                  // a word spoken
+  {p:[[50,50],[50,16],[82,40],[70,78],[30,78],[18,40]], l:[[1,0],[2,0],[3,0],[4,0],[5,0]], big:[0]},                    // five around one
+  {p:[[36,12],[22,32],[18,50],[22,68],[36,88],[64,12],[78,32],[82,50],[78,68],[64,88],[50,50]], l:[[0,1,2,3,4],[5,6,7,8,9]], big:[10]}, // two mirrors
+];
+function starArt(a, cls, label, rs=1){
+  const pt = i => a.p[i].join(",");
+  return `<svg class="art ${cls||""}" viewBox="0 0 100 100" ${label?`role="img" aria-label="${esc(label)}"`:`aria-hidden="true"`}>
+    ${a.l.map(l=>`<polyline pathLength="1" points="${l.map(pt).join(" ")}"/>`).join("")}
+    ${a.p.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${(rs*((a.big||[]).includes(i)?4.2:2.8)).toFixed(1)}" style="animation-delay:${(.15*i).toFixed(2)}s"/>`).join("")}</svg>`;
+}
+const glyph = (tag, cls) => starArt(GLYPHS[tag]||GLYPHS.none, cls, (AVATARS[tag]||["The Unnamed"])[0], cls==="mini"?2.4:1);
+// The ladder, drawn in stars: rungs climbed are lit, the one you are on glows, the rest wait.
+function ladderSVG(at){
+  const y = i => 112-i*24, cls = i => i<at ? "on" : i===at ? "now" : "off";
+  return `<svg class="art ladder" viewBox="0 0 60 130" role="img" aria-label="Rung ${at+1} of ${RUNGS.length}">
+    <line class="rail" x1="12" y1="124" x2="12" y2="6"/><line class="rail" x1="48" y1="124" x2="48" y2="6"/>
+    ${RUNGS.map((_,i)=>`<line class="${cls(i)}" x1="12" y1="${y(i)}" x2="48" y2="${y(i)}"/><circle class="${cls(i)}" cx="12" cy="${y(i)}" r="2.6"/><circle class="${cls(i)}" cx="48" cy="${y(i)}" r="2.6"/>`).join("")}</svg>`;
+}
 
 // ---------- WORDING POOLS ----------
 // Feedback is drawn at random so players can't learn the mechanism from fixed phrases.
@@ -279,12 +353,14 @@ const me = () => S.players[S.turn];
 // A dilemma in the version this run plays. Drawn the first time it comes up, then kept (and saved), so replays
 // and everyone at the table get the same one. 0 is the original.
 function dilemmaOf(id){
+  if(id==="practice") return PRACTICE;
   const v = VARIANTS[id];
   if(!v) return DILEMMAS[id];
   if(!(id in S.variants)) S.variants[id] = Math.floor(Math.random()*(v.length+1));
   return { ...DILEMMAS[id], ...v[S.variants[id]-1] };
 }
-const group = () => S.mode==="group";
+// The practice round is played as one, even in a group.
+const group = () => S.mode==="group" && !(cur && cur.practice);
 function loadSave(){
   try{
     const x = JSON.parse(store(SAVE_KEY));
@@ -496,9 +572,9 @@ function meters(){
   $("slEgo").style.color = egoCol;
   meterTurn = S.turn;
   const r = RUNGS[S.rung];
-  $("rung").textContent = (r ? `Rung ${S.rung+1} of ${RUNGS.length}: ${r.name} (${r.mr})` : "Last step")
+  $("rung").innerHTML = (P.glyph ? glyph(P.glyph,"mini") : "") + esc(cur && cur.practice ? "Practice" : (r ? `Rung ${S.rung+1} of ${RUNGS.length}: ${r.name} (${r.mr})` : "Last step")
     + (group() ? ` · meters: ${P.name}` : "")
-    + (P.publicName ? ` · seen as ${P.publicName}` : "");
+    + (P.publicName ? ` · seen as ${P.publicName}` : ""));
 }
 function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 function labelOf(id, optId){ return optionOf(id,optId).label; }
@@ -518,11 +594,38 @@ function start(){
       <dt>Stars</dt><dd>The ring shows how much of the sky has come back. It can only fill near the end. If you play together, you share the sky.</dd></dl></details>
     <div class="opts">${S.resume
       ? `<button class="primary" onclick="resume()">Continue${group()?` (${S.players.map(p=>esc(p.name)).join(", ")})`:""}: rung ${Math.min(S.rung+1,RUNGS.length)} of ${RUNGS.length}</button><button onclick="clearSave();location.reload()">Start over</button>`
-      : `<button class="primary" onclick="rungCard()">Play alone</button><button onclick="groupSetup()">Play together on one device (2 to 5 people)</button>`}
+      : `<button class="primary" onclick="begin()">Play alone</button><button onclick="groupSetup()">Play together on one device (2 to 5 people)</button>`}
       ${loadSkies().length?`<button onclick="skiesView()">Your skies (${loadSkies().length})</button>`:""}
+      <button class="quiet" onclick="practice(start)">How to play</button>
       <button class="quiet" onclick="intro(start)">Watch the opening again</button></div></div>`;
   store("gs_help","1");
   meters();
+}
+// ---------- PRACTICE ----------
+// One short dilemma before the first climb, played on the real screen, one step at a time.
+// It counts for nothing: the players are put back as they were. Once per device, and again from "How to play".
+const PRACTICE_STEPS = [
+  "Pick a first answer. There's no right one.",
+  "Now look underneath. Tap \"What is this assuming?\". Questioning costs nothing, and it is how you climb: watch Doubt go up.",
+  "Does that change your mind? You can switch, and switching after looking counts most. Find the rest too, since one may open a third way. Then say how sure you are.",
+  "Being sure is fine once you have looked. Being sure without looking feeds your Ego. Commit when you are ready."];
+let practiced = null;
+function begin(){ store("gs_tut") ? rungCard() : practice(rungCard); }
+function practice(then){
+  practiced = { players:JSON.stringify(S.players), turn:S.turn, then };
+  S.turn = 0;
+  showDilemma("practice", false, [0]);
+}
+function endPractice(){
+  const b = practiced; practiced = null; cur = null;
+  S.players = JSON.parse(b.players); S.turn = b.turn;
+  store("gs_tut","1");
+  scrollTo({top:0,behavior:"instant"});
+  b.then();
+}
+function coach(t){
+  return `<div class="coach"><div class="sub">Practice round${S.mode==="group"?", together":""} · nothing here counts</div>
+    <p>${esc(t)}</p><button class="quiet" onclick="endPractice()">Skip practice</button></div>`;
 }
 function resume(){ ({next:nextDilemma, card:rungCard, reveal:avatarReveal, gate:gate})[S.resume](); }
 
@@ -543,7 +646,7 @@ function groupStart(e){
     $("gsfb").innerHTML = `<div class="fb no">Enter at least two different names.</div>`; return;
   }
   S.mode = "group"; S.players = names.map(newPlayer); S.turn = 0;
-  rungCard();
+  begin();
 }
 
 // Shown at the start of each rung.
@@ -551,6 +654,7 @@ function rungCard(){
   const r = RUNGS[S.rung];
   if(!r) return nextDilemma();
   V.innerHTML = `<div class="card">
+    <div class="rungart">${ladderSVG(S.rung)}${starArt(EMBLEMS[S.rung],"emblem draw",r.name)}</div>
     <div class="sub">Rung ${S.rung+1} of ${RUNGS.length}</div>
     <h2>${esc(r.name)}</h2><div class="mr">${r.mr}</div>
     <p>${esc(r.about)}</p>
@@ -577,7 +681,7 @@ function nextDilemma(){
 
 // who: the players answering, by index. Everyone, except on a replay.
 function showDilemma(id, final, who){
-  cur = { id, d:dilemmaOf(id), final, who: who || S.players.map((_,i)=>i), k:0, answers:{} };
+  cur = { id, d:dilemmaOf(id), final, practice: id==="practice", who: who || S.players.map((_,i)=>i), k:0, answers:{} };
   turn();
 }
 // One player's private turn. Option and assumption order change every time, so position gives nothing away.
@@ -604,7 +708,14 @@ function renderDilemma(){
   const {d} = cur;
   const assumeHtml = cur.assume.slice(0,cur.shown).map((a,i)=>`<div class="a-item${cur.newA&&i===cur.shown-1?" a-new":""}">${esc(a.t)}</div>`).join("");
   const more = cur.shown < cur.assume.length;
-  V.innerHTML = `<div class="card">
+  // Found, not left: questioning costs nothing, so the count is something to fill, not a supply to save.
+  const dots = cur.assume.map((_,i)=>i<cur.shown?"●":"○").join("");
+  // Practice: one step at a time. 0 answer, 1 look underneath, 2 change your mind and say how sure, 3 commit.
+  const ps = !cur.practice ? 9 : !cur.choice ? 0 : !cur.shown ? 1 : !cur.conf ? 2 : 3;
+  const faint = !cur.practice && !cur.final && cur.id!=="fifthhead" && EMBLEMS[S.rung];
+  V.innerHTML = `<div class="card${faint?" marked":""}">
+    ${faint ? starArt(EMBLEMS[S.rung],"faint") : ""}
+    ${cur.practice ? coach(PRACTICE_STEPS[ps]) : ""}
     ${group()?`<div class="sub">${esc(me().name)}, in private</div>`:""}
     ${cur.id==="fifthhead" ? `<div class="closeup">${figSVG("44 22 285 150", {p:5200,d:1500,t:0,stop:1e12})}</div>` : ""}
     <h2>${esc(d.title)}</h2><div class="mr">${d.mr}</div>
@@ -612,14 +723,14 @@ function renderDilemma(){
     ${d.src?`<div class="src">${esc(d.src)}</div>`:""}
     <div class="opts">${cur.opts.map(o=>`<button class="${cur.choice===o.id?"sel":""}${o.id===cur.doorId?" third":""}${o.id===cur.fresh?" door":""}" onclick="choose('${o.id}')">${esc(o.label)}</button>`).join("")}
       ${cur.doorLine?`<p class="doorline${cur.fresh?" fresh":""}">${esc(cur.doorLine)}</p>`:""}</div>
-    <div class="sub">How sure are you?</div>
-    <div class="row">${[["certain","Certain"],["leaning","Leaning"],["unsure","Unsure"]].map(([k,l])=>`<button class="${cur.conf===k?"sel":""}" onclick="conf('${k}')">${l}</button>`).join("")}</div>
-    <div class="assume"><h3>Question the premise</h3>
-      ${assumeHtml || `<p class="note">This dilemma rests on assumptions. Once you have a first answer, you can expose them.</p>`}
+    ${ps<2 ? "" : `<div class="sub">How sure are you?</div>
+    <div class="row">${[["certain","Certain"],["leaning","Leaning"],["unsure","Unsure"]].map(([k,l])=>`<button class="${cur.conf===k?"sel":""}" onclick="conf('${k}')">${l}</button>`).join("")}</div>`}
+    ${ps<1 ? "" : `<div class="assume"><h3>Question the premise</h3>
+      ${assumeHtml || `<p class="note">This dilemma rests on assumptions. Once you have a first answer, you can expose them. It costs nothing.</p>`}
       ${cur.shown && cur.first ? `<p class="note">Does this change your answer? You can still switch.${cur.choice!==cur.first?` (Your first answer was "${esc(cur.opts.find(o=>o.id===cur.first).label)}".)`:""}</p>` : ""}
-      ${more ? `<button ${cur.choice?"":"disabled"} onclick="reveal()">What is this assuming? (${cur.assume.length-cur.shown} left)</button>` : `<p class="note">All assumptions exposed.</p>`}
-    </div>
-    <div class="opts"><button class="primary" ${cur.choice&&cur.conf?"":"disabled"} onclick="commit()">Commit</button></div>
+      ${more ? `<button ${cur.choice?"":"disabled"} onclick="reveal()">What is this assuming? <span class="dots" aria-hidden="true">${dots}</span> <span class="note">${cur.shown} of ${cur.assume.length} found</span></button>` : `<p class="note"><span class="dots" aria-hidden="true">${dots}</span> All three found.</p>`}
+    </div>`}
+    ${ps<3 ? "" : `<div class="opts"><button class="primary" ${cur.choice&&cur.conf?"":"disabled"} onclick="commit()">Commit</button></div>`}
   </div>`;
   // A door just opened: it appears above the button that was tapped, so bring it into view, and let the sky stir.
   if(cur.fresh){ const el = document.querySelector(".door"); if(el) el.scrollIntoView({block:"center"}); pulseAt = performance.now(); }
@@ -705,9 +816,11 @@ function renderSplit(){
     <h2>The Split</h2><div class="mr">लोक एकमेकांशी बोलून खेळत, पण त्यांचं एकमत होत नसे.</div>
     <div class="split">${rows}</div>
     <p class="note">Simulated players in this prototype.</p>
+    ${cur.practice ? coach("This is how others split. They disagree, and that is the point. No answer is scored as right.") : ""}
     ${cur.answers[S.turn].msgs}
     <div class="assume"><h3>Argue the other side</h3>
       <p>Which is the strongest case for <b>"${esc(target.label)}"</b>?</p>
+      ${steelHint()}
       ${makeSteel(cur.choice, target)}
     </div></div>`;
   meters();
@@ -749,10 +862,16 @@ function steelTurn(){
     <h2>${esc(me().name)}, make the case.</h2>
     <p>What is the strongest case for <b>"${esc(target.label)}"</b>, ${whose}?</p>
     ${by ? `<p class="note">${esc(by)}, no hints, please.</p>` : ""}
+    ${steelHint()}
     ${makeSteel(own, target)}</div>`;
   meters();
 }
 
+// The first time in a run, and in practice: what the three choices are.
+function steelHint(){
+  if(cur.practice) return `<p class="note"><b>Argue for the side you didn't pick.</b> One of these is its honest case. One is a caricature of it, and one is a good case for a different answer. Find the honest one.</p>`;
+  return me().history.length===1 ? `<p class="note">One of these is the honest case. One is a caricature, and one argues for a different answer.</p>` : "";
+}
 function steel(i){
   const a = cur.args[i], P = me();
   document.querySelectorAll("#args button").forEach((b,j)=>{ b.disabled=true; if(cur.args[j].kind==="ok") b.classList.add("sel"); });
@@ -761,7 +880,7 @@ function steel(i){
   if(a.kind==="ok"){ P.tol = Math.min(TMAX, P.tol+2); msg = `<div class="fb ok">${esc(pick(SAY.tolOk))}</div>`; }
   else if(a.kind==="decoy"){ msg = `<div class="fb no">${esc(fill(pick(SAY.tolDecoy),{own:a.own,target:cur.target.label}))} The case for "${esc(cur.target.label)}" is highlighted.</div>`; }
   else { P.tol = Math.max(0,P.tol-1); msg = `<div class="fb no">${esc(pick(SAY.tolBad))} The honest argument is highlighted.</div>`; }
-  let next = `<button class="primary" onclick="afterDilemma()">${cur.final?"Hear the Auditor":"Continue"}</button>`;
+  let next = `<button class="primary" onclick="afterDilemma()">${cur.final?"Hear the Auditor":cur.practice?(practiced.then===rungCard?"Done. Start the climb":"Done"):"Continue"}</button>`;
   if(group() && cur.sk+1 < cur.who.length){
     cur.sk++;
     next = `<button class="primary" onclick="steelTurn()">Next: ${esc(S.players[cur.who[cur.sk]].name)}</button>`;
@@ -771,6 +890,7 @@ function steel(i){
 }
 
 function afterDilemma(){
+  if(cur.practice) return endPractice();
   if(cur.final) return finale(ending);
   skyBeat(advance);
 }
@@ -786,13 +906,21 @@ function advance(){
 }
 
 // ---------- AVATAR REVEAL (public) ----------
-function avatarName(P){
+function avatarTag(P){
   const top = Object.entries(P.tags).sort((a,b)=>b[1]-a[1])[0];
-  return (top && AVATARS[top[0]]) || ["The Unnamed","अनामिक"];
+  return top && AVATARS[top[0]] ? top[0] : "none";
+}
+function avatarName(P){ return AVATARS[avatarTag(P)] || ["The Unnamed","अनामिक"]; }
+// The avatar's constellation draws itself. If the name moved, the old one fades as the new one draws.
+function revealArt(P, prev){
+  const now = avatarTag(P);
+  return `<div class="revart">${prev && prev!==now ? glyph(prev,"old") : ""}${glyph(now,"draw")}</div>`;
 }
 function avatarReveal(){
   if(group()) return roomReveal();
   const [en,mr] = avatarName(me());
+  const firstTime = !me().publicName, prevGlyph = me().glyph;
+  me().glyph = avatarTag(me());
   const shift = shiftLine(me().publicName, `${en} · ${mr}`);
   me().publicName = `${en} · ${mr}`;
   // Other players get distinct names, never the player's own, shown in both languages like the player's.
@@ -801,8 +929,10 @@ function avatarReveal(){
   V.innerHTML = `<div class="card center">
     <div class="sub">Avatar reveal · अवताराची ओळख</div>
     <p>Your avatar must now show its face to everyone on the network. Judging by your choices, it is:</p>
+    ${revealArt(me(), prevGlyph)}
     <p class="big"><b>${esc(en)}</b> <span class="mr">${mr}</span></p>
     ${shift?`<p class="auditor">${esc(shift)}</p>`:""}
+    ${firstTime?`<p class="note">${REVEAL_HINT}</p>`:""}
     <p class="note">Everyone can now see this name next to yours. Also revealed this round (simulated):</p>
     <div class="others">${others}</div>
     <div class="row"><button onclick="reveal2(true)">Yes, that is me</button><button onclick="reveal2(false)">That is not who I am</button></div>
@@ -810,10 +940,11 @@ function avatarReveal(){
   meters();
 }
 // Group: every avatar is named in front of the room, and each player answers for their own.
-let revealed = {};
+let revealed = {}, revealFirst = false;
+const REVEAL_HINT = "The game names you by the choices you made most often. Accept the name and your Ego clears. Refuse it and Ego grows.";
 function roomReveal(){
-  revealed = {};
-  S.players.forEach(P=>{ const [en,mr] = avatarName(P), now = `${en} · ${mr}`; P.shift = shiftLine(P.publicName, now); P.publicName = now; });
+  revealed = {}; revealFirst = S.players.every(P=>!P.publicName);
+  S.players.forEach(P=>{ const [en,mr] = avatarName(P), now = `${en} · ${mr}`; P.shift = shiftLine(P.publicName, now); P.publicName = now; P.prevGlyph = P.glyph; P.glyph = avatarTag(P); });
   renderRoomReveal();
 }
 function renderRoomReveal(){
@@ -821,7 +952,9 @@ function renderRoomReveal(){
   V.innerHTML = `<div class="card center">
     <div class="sub">Avatar reveal · अवताराची ओळख</div>
     <p>Every avatar must now show its face to the room. Judging by your choices:</p>
+    ${revealFirst?`<p class="note">${REVEAL_HINT}</p>`:""}
     ${S.players.map((P,i)=>{ const [en,mr] = avatarName(P); return `<div class="revrow">
+      ${revealArt(P, P.prevGlyph)}
       <p class="big"><b>${esc(P.name)}</b>: ${esc(en)} <span class="mr">${mr}</span></p>
       ${P.shift?`<p class="auditor">${esc(P.shift)}</p>`:""}
       ${i in revealed ? `<div class="fb ${revealed[i].ok?"ok":"no"}">${esc(revealed[i].msg)}</div>`

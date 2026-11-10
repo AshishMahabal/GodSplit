@@ -3,12 +3,12 @@
 // Run via test.sh (expects g.js = dilemmas.js + page script).
 const fs=require('fs'), path=require('path');
 const src=fs.readFileSync(path.join(__dirname,'..','prototype','dilemmas.js'),'utf8');
-eval(src+';global.C={DILEMMAS,VARIANTS,AXES,RUNGS,CHAINS,CHANCE,PER_RUNG,FINAL};');
-const {DILEMMAS,VARIANTS,AXES,RUNGS,CHAINS,CHANCE,PER_RUNG,FINAL}=C;
+eval(src+';global.C={DILEMMAS,VARIANTS,AXES,RUNGS,CHAINS,CHANCE,PER_RUNG,FINAL,PRACTICE};');
+const {DILEMMAS,VARIANTS,AXES,RUNGS,CHAINS,CHANCE,PER_RUNG,FINAL,PRACTICE}=C;
 const errs=[];
 const AVATAR_TAGS=["util","duty","loyal","now","later","world","seeker","reframe","we","stay","switch","continuity","change","self"];
 // Every dilemma, and every variant as the game would play it (merged over its dilemma).
-const versions=Object.entries(DILEMMAS);
+const versions=Object.entries(DILEMMAS).concat([["practice",PRACTICE]]);
 let nvar=0;
 for(const [id,vs] of Object.entries(VARIANTS)){
   if(!DILEMMAS[id]) { errs.push(`variant of missing dilemma ${id}`); continue; }
